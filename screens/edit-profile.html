@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Edit Profile</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .edit-avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-xl) 0;
+    }
+    .edit-avatar {
+      width: 88px; height: 88px; border-radius: var(--radius-full);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--font-3xl); font-weight: 800; color: white; position: relative;
+    }
+    .edit-avatar-badge {
+      position: absolute; bottom: 0; right: 0;
+      width: 28px; height: 28px; background: var(--accent-primary); border-radius: 50%;
+      border: 3px solid var(--bg-primary);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .edit-avatar-badge svg { width: 14px; height: 14px; fill: white; }
+    .change-photo-link {
+      color: var(--accent-primary); font-size: var(--font-sm); font-weight: 600;
+      margin-top: var(--space-sm); cursor: pointer; background: none; border: none; font-family: var(--font-family);
+    }
+    .edit-form { padding: 0 var(--space-xl); display: flex; flex-direction: column; gap: var(--space-lg); }
+    .form-row { display: flex; flex-direction: column; gap: 6px; }
+    .form-row label { font-size: var(--font-sm); color: var(--text-secondary); font-weight: 500; }
+    .form-row .input-field { background: var(--bg-input); }
+    .char-count { font-size: var(--font-xs); color: var(--text-muted); text-align: right; margin-top: 4px; }
+    textarea.input-field { resize: none; min-height: 80px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+    <div class="top-bar">
+      <a href="profile.html" class="back-btn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+      <span class="top-bar-title">Edit Profile</span>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='profile.html'">Save</button>
+    </div>
+    <div class="screen-content">
+      <div class="edit-avatar-section">
+        <div class="edit-avatar">J
+          <div class="edit-avatar-badge"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+        </div>
+        <button class="change-photo-link">Change Profile Photo</button>
+      </div>
+      <form class="edit-form" onsubmit="return false;">
+        <div class="form-row"><label>Name</label><input type="text" class="input-field" value="Dr. Jayesh Kumar"></div>
+        <div class="form-row"><label>Username</label><input type="text" class="input-field" value="dr_jayesh"></div>
+        <div class="form-row"><label>Bio</label><textarea class="input-field">Cardiologist & health educator. Spreading medical awareness one reel at a time. Based in Mumbai.</textarea><div class="char-count">93/150</div></div>
+        <div class="form-row"><label>Website</label><input type="url" class="input-field" placeholder="Add a link"></div>
+        <div class="form-row"><label>Gender</label>
+          <select class="input-field" style="appearance: none;"><option>Prefer not to say</option><option>Male</option><option>Female</option><option>Non-binary</option></select>
+        </div>
+        <div class="form-row"><label>Date of Birth</label><input type="date" class="input-field" value="1995-06-15"></div>
+        <div style="height: var(--space-xl);"></div>
+      </form>
+    </div>
+  </div>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

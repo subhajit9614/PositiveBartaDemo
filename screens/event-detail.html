@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Event Detail</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    /* Hero banner */
+    .event-hero {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #1a2a5e 0%, #4a1a5e 50%, #5e1a4a 100%);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .event-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+    }
+
+    .event-hero-back {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      z-index: 2;
+    }
+
+    .event-hero-back svg { width: 20px; height: 20px; fill: white; }
+
+    .event-hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 16px 20px;
+      width: 100%;
+    }
+
+    .event-hero-date {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-primary);
+      color: white;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-xs);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .event-hero-date svg { width: 14px; height: 14px; fill: white; }
+
+    .event-hero-title {
+      font-size: var(--font-2xl);
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+    }
+
+    /* Body */
+    .event-body {
+      padding: 20px;
+    }
+
+    /* Info rows */
+    .event-detail-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .detail-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .detail-icon svg { width: 18px; height: 18px; fill: var(--text-muted); }
+
+    .detail-text { flex: 1; padding-top: 2px; }
+    .detail-label { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: 2px; }
+    .detail-value { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); }
+
+    /* Attendees row */
+    .event-attendees-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 14px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+    }
+
+    .attendee-stack {
+      display: flex;
+    }
+
+    .attendee-stack .av {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-primary);
+      margin-left: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .attendee-stack .av:first-child { margin-left: 0; }
+
+    .attendees-text {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+    }
+
+    .attendees-text strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    /* Description */
+    .event-section-title {
+      font-size: var(--font-sm);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .event-description {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* Action buttons — pinned below hero */
+    .event-actions {
+      display: flex;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 8px;
+      border-radius: var(--radius-md);
+      font-size: var(--font-sm);
+      font-weight: 700;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .action-btn svg { width: 18px; height: 18px; }
+
+    .action-btn.upload-reel {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .action-btn.upload-reel svg { fill: white; }
+    .action-btn.upload-reel:hover { background: #d63a52; }
+
+    @keyframes ai-pulse-btn {
+      0%, 100% { box-shadow: 0 3px 14px rgba(168, 85, 247, 0.55), 0 0 0 0 rgba(168, 85, 247, 0.3); }
+      50% { box-shadow: 0 4px 20px rgba(168, 85, 247, 0.8), 0 0 0 5px rgba(168, 85, 247, 0); }
+    }
+
+    .action-btn.suggest-ideas {
+      background: linear-gradient(135deg, #c026d3, #a855f7, #6366f1);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: white;
+      animation: ai-pulse-btn 2.4s ease-in-out infinite;
+    }
+
+    .action-btn.suggest-ideas svg { fill: white; }
+    .action-btn.suggest-ideas:hover { filter: brightness(1.1); }
+
+    /* Suggest Ideas overlay */
+    .ideas-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .ideas-overlay.active {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .ideas-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .ideas-sheet {
+      position: relative;
+      width: 100%;
+      max-width: 393px;
+      max-height: 75vh;
+      background: var(--bg-primary);
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ideas-overlay.active .ideas-sheet {
+      transform: translateY(0);
+    }
+
+    .ideas-sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ideas-sheet-title {
+      font-size: var(--font-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ideas-sheet-title svg { width: 20px; height: 20px; fill: #8b5cf6; }
+
+    .ideas-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .ideas-close svg { width: 16px; height: 16px; fill: var(--text-muted); }
+
+    .ideas-sheet-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .idea-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .idea-card-num {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #8b5cf6;
+      margin-bottom: 4px;
+    }
+
+    .idea-card-title {
+      font-size: var(--font-md);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .idea-card-desc {
+      font-size: var(--font-xs);
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Loading state */
+    .ideas-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+      gap: 12px;
+    }
+
+    .ideas-loading .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border-color);
+      border-top-color: #8b5cf6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ideas-loading-text {
+      font-size: var(--font-sm);
+      color: var(--text-muted);
+    }
+
+    /* Disabled action buttons (past events) */
+    .action-btn:disabled {
+      background: var(--bg-surface) !important;
+      color: var(--text-muted) !important;
+      border: 1.5px solid var(--border-color);
+      cursor: not-allowed;
+      animation: none !important;
+      filter: none !important;
+      box-shadow: none !important;
+      opacity: 0.6;
+    }
+
+    .action-btn:disabled svg { fill: var(--text-muted) !important; }
+
+    /* Event Ended banner */
+    .event-ended-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      background: rgba(239, 68, 68, 0.08);
+      border-bottom: 1px solid rgba(239, 68, 68, 0.18);
+    }
+
+    .event-ended-banner svg { width: 16px; height: 16px; fill: #ef4444; flex-shrink: 0; }
+
+    .event-ended-text {
+      font-size: var(--font-xs);
+      font-weight: 600;
+      color: #ef4444;
+    }
+
+    .event-ended-text span {
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    /* Event summary stats */
+    .event-stats-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: var(--font-xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    /* Winner card */
+    .winner-card {
+      margin: 16px 20px 0;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      display: none;
+    }
+
+    .winner-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .winner-trophy {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 170, 0, 0.12);
+      border: 1px solid rgba(255, 170, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .winner-trophy svg { width: 20px; height: 20px; fill: var(--warning); }
+
+    .winner-heading {
+      font-size: var(--font-md);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .winner-subheading {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .winner-rows {
+      padding: 4px 0;
+    }
+
+    .winner-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .winner-row:last-child { border-bottom: none; }
+
+    .winner-row-label {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+    }
+
+    .winner-row-value {
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .winner-row-value.highlight { color: var(--warning); }
+
+    /* Join button */
+    .join-bar {
+      padding: 12px 20px 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .join-btn {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1.5px solid var(--accent-primary);
+      color: var(--accent-primary);
+      border-radius: var(--radius-md);
+      font-size: var(--font-md);
+      font-weight: 700;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .join-btn:hover { background: var(--accent-primary); color: white; }
+
+    .join-btn.joined {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <!-- Hero -->
+    <div class="event-hero">
+      <div class="event-hero-overlay"></div>
+      <button class="event-hero-back" onclick="window.location.href='events.html'">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <div class="event-hero-content">
+        <div class="event-hero-date">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          April 15, 2026
+        </div>
+        <div class="event-hero-title">National Medical Reels Summit 2026</div>
+      </div>
+    </div>
+
+    <!-- Action buttons right below hero -->
+    <div class="event-actions">
+      <button class="action-btn upload-reel" id="uploadReelBtn" onclick="localStorage.setItem('eventReel','National Medical Reels Summit 2026');window.location.href='create.html'">
+        <svg viewBox="0 0 24 24"><path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z"/></svg>
+        Upload Reel
+      </button>
+      <button class="action-btn suggest-ideas" id="aiIdeasBtn" onclick="openIdeas()">
+        <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+        AI Ideas
+      </button>
+    </div>
+
+    <!-- Event Ended banner (hidden by default, shown for past events) -->
+    <div class="event-ended-banner" id="endedBanner" style="display:none;">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      <div class="event-ended-text">This event has ended <span>· April 15, 2026</span></div>
+    </div>
+
+    <!-- Winner card (hidden by default, shown only for won events) -->
+    <div class="winner-card" id="winnerCard">
+      <div class="winner-card-header">
+        <div class="winner-trophy">
+          <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+        </div>
+        <div>
+          <div class="winner-heading">You Won!</div>
+          <div class="winner-subheading">Here's a summary of your achievement</div>
+        </div>
+      </div>
+      <div class="winner-rows">
+        <div class="winner-row">
+          <span class="winner-row-label">Award</span>
+          <span class="winner-row-value highlight">Best Healthcare Creator</span>
+        </div>
+        <div class="winner-row">
+          <span class="winner-row-label">Category</span>
+          <span class="winner-row-value">Short-form Medical Reels</span>
+        </div>
+        <div class="winner-row">
+          <span class="winner-row-label">Announced on</span>
+          <span class="winner-row-value">Apr 22, 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-content" style="padding-bottom: 0;">
+      <div class="event-body">
+
+        <!-- Location -->
+        <div class="event-detail-row">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Location</div>
+            <div class="detail-value">AIIMS Convention Centre, New Delhi</div>
+          </div>
+        </div>
+
+        <!-- Time -->
+        <div class="event-detail-row">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Time</div>
+            <div class="detail-value">10:00 AM - 6:00 PM</div>
+          </div>
+        </div>
+
+        <!-- Organizer -->
+        <div class="event-detail-row">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Organized by</div>
+            <div class="detail-value">Itibachok Barta Team</div>
+          </div>
+        </div>
+
+        <!-- Attendees -->
+        <div class="event-attendees-row">
+          <div class="attendee-stack">
+            <div class="av" style="background: linear-gradient(135deg, #ff9a9e, #fad0c4);">F</div>
+            <div class="av" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb);">G</div>
+            <div class="av" style="background: linear-gradient(135deg, #d4fc79, #96e6a1);">H</div>
+            <div class="av" style="background: linear-gradient(135deg, #667eea, #764ba2);">A</div>
+          </div>
+          <div class="attendees-text"><strong>310+</strong> people going</div>
+        </div>
+
+        <!-- Event Summary Stats (past event only) -->
+        <div id="eventStats" style="display:none;">
+          <div class="event-section-title">Event Summary</div>
+          <div class="event-stats-row">
+            <div class="stat-card">
+              <div class="stat-value">318</div>
+              <div class="stat-label">Attended</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">47</div>
+              <div class="stat-label">Reels Posted</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">2.1M</div>
+              <div class="stat-label">Total Views</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="event-section-title">About this event</div>
+        <div class="event-description">Join doctors and healthcare creators from across India for a full-day summit celebrating medical awareness through short-form video. Featuring keynote speakers, panel discussions, networking sessions, and hands-on workshops focused on using reels for health education and patient outreach.</div>
+
+      </div>
+    </div>
+
+    <!-- Suggest Ideas overlay -->
+    <div class="ideas-overlay" id="ideasOverlay">
+      <div class="ideas-backdrop" onclick="closeIdeas()"></div>
+      <div class="ideas-sheet">
+        <div class="ideas-sheet-header">
+          <div class="ideas-sheet-title">
+            <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+            AI Reel Ideas
+          </div>
+          <button class="ideas-close" onclick="closeIdeas()">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
+        <div class="ideas-sheet-body" id="ideasBody">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Apply past-event mode if ?past=true is in the URL
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const isPast = params.get('past') === 'true';
+      const isWon  = params.get('won')  === 'true';
+
+      if (isPast) {
+        // Disable action buttons
+        const uploadBtn = document.getElementById('uploadReelBtn');
+        const aiBtn = document.getElementById('aiIdeasBtn');
+        uploadBtn.disabled = true;
+        uploadBtn.removeAttribute('onclick');
+        aiBtn.disabled = true;
+        aiBtn.removeAttribute('onclick');
+
+        // Show ended banner
+        document.getElementById('endedBanner').style.display = 'flex';
+
+        // Show summary stats
+        document.getElementById('eventStats').style.display = 'block';
+      }
+
+      if (isWon) {
+        document.getElementById('winnerCard').style.display = 'block';
+      }
+    })();
+    function toggleJoin() {
+      const btn = document.getElementById('joinBtn');
+      if (btn.classList.contains('joined')) {
+        btn.classList.remove('joined');
+        btn.textContent = 'Join Event';
+      } else {
+        btn.classList.add('joined');
+        btn.textContent = 'Joined';
+      }
+    }
+
+    // Suggest Ideas overlay
+    function openIdeas() {
+      const overlay = document.getElementById('ideasOverlay');
+      const body = document.getElementById('ideasBody');
+      overlay.classList.add('active');
+
+      // Show loading
+      body.innerHTML = '<div class="ideas-loading"><div class="spinner"></div><div class="ideas-loading-text">Generating reel ideas...</div></div>';
+
+      // Simulate AI response
+      setTimeout(() => {
+        body.innerHTML = `
+          <div class="idea-card">
+            <div class="idea-card-num">Idea 1</div>
+            <div class="idea-card-title">Behind the Scenes at the Hospital</div>
+            <div class="idea-card-desc">Film your journey to the summit - arriving at AIIMS, registration, and first impressions of the venue. Use trending audio with quick cuts between moments.</div>
+          </div>
+          <div class="idea-card">
+            <div class="idea-card-num">Idea 2</div>
+            <div class="idea-card-title">3 Health Tips from the Summit</div>
+            <div class="idea-card-desc">After a keynote or panel, share your top 3 medical takeaways in a fast-paced talking-head reel with text overlays.</div>
+          </div>
+          <div class="idea-card">
+            <div class="idea-card-num">Idea 3</div>
+            <div class="idea-card-title">Doctor Spotlight Interview</div>
+            <div class="idea-card-desc">Interview another doctor for 15 seconds - ask them what health message they want to spread to the world through reels.</div>
+          </div>
+          <div class="idea-card">
+            <div class="idea-card-num">Idea 4</div>
+            <div class="idea-card-title">Medical Event Montage</div>
+            <div class="idea-card-desc">Capture clips throughout the day - crowd energy, speakers, networking sessions - and stitch into a cinematic montage reel.</div>
+          </div>
+        `;
+      }, 1800);
+    }
+
+    function closeIdeas() {
+      document.getElementById('ideasOverlay').classList.remove('active');
+    }
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

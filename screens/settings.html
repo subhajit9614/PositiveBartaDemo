@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Settings</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .settings-group { margin-bottom: var(--space-lg); }
+    .settings-group-label {
+      padding: var(--space-sm) var(--space-lg); font-size: var(--font-xs);
+      font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .settings-item {
+      display: flex; align-items: center; gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg); cursor: pointer; transition: background 0.2s;
+    }
+    .settings-item:hover { background: var(--hover-overlay); }
+    .settings-icon {
+      width: 36px; height: 36px; border-radius: var(--radius-md);
+      background: var(--bg-surface); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .settings-icon svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+    .settings-icon.blue { background: rgba(79,172,254,0.15); }
+    .settings-icon.blue svg { fill: #4facfe; }
+    .settings-icon.purple { background: rgba(83,52,131,0.2); }
+    .settings-icon.purple svg { fill: #a18cd1; }
+    .settings-icon.green { background: rgba(0,214,143,0.15); }
+    .settings-icon.green svg { fill: var(--success); }
+    .settings-icon.orange { background: rgba(255,170,0,0.15); }
+    .settings-icon.orange svg { fill: var(--warning); }
+    .settings-icon.red { background: rgba(255,61,113,0.15); }
+    .settings-icon.red svg { fill: var(--error); }
+    .settings-info { flex: 1; min-width: 0; }
+    .settings-label { font-size: var(--font-md); color: var(--text-primary); }
+    .settings-desc { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+    .settings-right { color: var(--text-muted); display: flex; align-items: center; gap: 4px; font-size: var(--font-sm); }
+    .settings-right svg { width: 16px; height: 16px; fill: var(--text-muted); }
+    .settings-divider { height: 1px; background: var(--border-color); margin: 0 var(--space-lg); }
+    .danger-item .settings-label { color: var(--error); }
+    .version-text { text-align: center; padding: var(--space-xl); font-size: var(--font-xs); color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+    <div class="top-bar">
+      <a href="profile.html" class="back-btn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+      <span class="top-bar-title">Settings</span>
+      <div style="width: 36px;"></div>
+    </div>
+    <div class="screen-content">
+      <!-- Account -->
+      <div class="settings-group">
+        <div class="settings-group-label">Account</div>
+        <a href="change-password.html" class="settings-item" style="text-decoration:none; color:inherit;">
+          <div class="settings-icon blue"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>
+          <div class="settings-info"><div class="settings-label">Change Password</div></div>
+          <div class="settings-right"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </a>
+      </div>
+      <div class="settings-divider"></div>
+      <!-- Content -->
+      <div class="settings-group">
+        <div class="settings-group-label">Content</div>
+        <div class="settings-item">
+          <div class="settings-icon green"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+          <div class="settings-info"><div class="settings-label">Push Notifications</div></div>
+          <div class="settings-right"><button class="toggle active" onclick="this.classList.toggle('active')"></button></div>
+        </div>
+      </div>
+      <div class="settings-divider"></div>
+      <!-- General -->
+      <div class="settings-group">
+        <div class="settings-group-label">General</div>
+        <div class="settings-item">
+          <div class="settings-icon orange"><svg viewBox="0 0 24 24"><path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg></div>
+          <div class="settings-info"><div class="settings-label">Dark Mode</div></div>
+          <div class="settings-right"><button class="toggle active theme-toggle"></button></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon"><svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></svg></div>
+          <div class="settings-info"><div class="settings-label">About</div></div>
+          <div class="settings-right">v1.0.0 <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon"><svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div>
+          <div class="settings-info"><div class="settings-label">Help & Support</div></div>
+          <div class="settings-right"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+      </div>
+      <div class="settings-divider"></div>
+      <!-- Danger Zone -->
+      <div class="settings-group">
+        <div class="settings-item danger-item">
+          <div class="settings-icon red"><svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg></div>
+          <div class="settings-info"><div class="settings-label" style="color: var(--error);">Log Out</div></div>
+        </div>
+        <div class="settings-item danger-item">
+          <div class="settings-icon red"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
+          <div class="settings-info"><div class="settings-label" style="color: var(--error);">Delete Account</div></div>
+        </div>
+      </div>
+      <div class="version-text">Itibachok Barta v1.0.0</div>
+    </div>
+  </div>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

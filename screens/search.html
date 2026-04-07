@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Search</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .search-bar-container {
+      padding: var(--space-sm) var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .search-bar {
+      flex: 1; position: relative;
+    }
+    .search-bar input {
+      width: 100%; padding: 12px 16px 12px 42px;
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      border-radius: var(--radius-full); color: var(--text-primary);
+      font-size: var(--font-md); font-family: var(--font-family); outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input::placeholder { color: var(--text-muted); }
+    .search-bar input:focus { border-color: var(--accent-primary); }
+    .search-bar .search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    }
+    .search-bar .search-icon svg { width: 18px; height: 18px; fill: var(--text-muted); }
+
+    /* AI Toggle */
+    .ai-search-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px var(--space-lg);
+      margin-bottom: 2px;
+    }
+
+    .ai-toggle-label {
+      font-size: 12px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #a855f7, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ai-toggle-switch {
+      width: 38px;
+      height: 22px;
+      background: var(--border-color);
+      border-radius: 11px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+
+    .ai-toggle-switch.on {
+      background: linear-gradient(90deg, #a855f7, #6366f1);
+    }
+
+    .ai-toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .ai-toggle-switch.on::after {
+      transform: translateX(16px);
+    }
+
+    .ai-toggle-sparkle {
+      width: 16px;
+      height: 16px;
+      fill: #a855f7;
+    }
+
+    /* Filter pills */
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      padding: var(--space-sm) var(--space-lg);
+    }
+
+    .filter-pill {
+      padding: 7px 18px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--border-color);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: var(--font-sm);
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .filter-pill.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: white;
+    }
+
+    /* Default view */
+    .default-view { display: block; }
+    .results-view { display: none; }
+    .ai-results-view { display: none; }
+
+    /* Default view uses same result styles as search results */
+
+    /* Search results */
+    .results-section {
+      padding: var(--space-sm) var(--space-lg);
+    }
+
+    .results-label {
+      font-size: var(--font-xs);
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+
+    /* People result card */
+    .people-result {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+    }
+
+    .people-result .pr-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: var(--font-md);
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .people-result .pr-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .people-result .pr-name {
+      font-size: var(--font-md);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .people-result .pr-handle {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+    }
+
+    .people-result .pr-follow-btn {
+      padding: 6px 16px;
+      border-radius: 8px;
+      background: var(--accent-primary);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      font-family: var(--font-family);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .people-result .pr-follow-btn.following {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Reel result grid */
+    .reels-result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .reel-result-card {
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 9/14;
+      cursor: pointer;
+    }
+
+    .reel-result-card .rrc-bg {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px;
+    }
+
+    .reel-result-card .rrc-user {
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .reel-result-card .rrc-caption {
+      font-size: 10px;
+      color: rgba(255,255,255,0.8);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      margin-top: 2px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .reel-result-card .rrc-views {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.7);
+      margin-top: 4px;
+    }
+
+    .reel-result-card .rrc-views svg {
+      width: 12px;
+      height: 12px;
+      fill: rgba(255,255,255,0.7);
+    }
+
+    /* AI search results */
+    .ai-search-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .ai-search-header svg {
+      width: 20px;
+      height: 20px;
+      fill: #a855f7;
+    }
+
+    .ai-search-header span {
+      font-size: var(--font-sm);
+      font-weight: 600;
+      background: linear-gradient(90deg, #a855f7, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ai-answer-card {
+      margin: 0 var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--bg-surface);
+      border-radius: 16px;
+      border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .ai-answer-card p {
+      font-size: var(--font-sm);
+      color: var(--text-primary);
+      line-height: 1.7;
+      margin-bottom: var(--space-sm);
+    }
+
+    .ai-answer-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .ai-answer-label {
+      display: inline-block;
+      background: linear-gradient(90deg, #a855f7, #6366f1);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ai-related-label {
+      padding: var(--space-md) var(--space-lg) var(--space-xs);
+      font-size: var(--font-xs);
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="search-bar-container">
+      <a href="home.html" class="back-btn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+      <div class="search-bar">
+        <span class="search-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span>
+        <input type="text" id="searchInput" placeholder="Search reels, people..." oninput="handleSearch()">
+      </div>
+    </div>
+
+    <!-- AI Toggle + Filter Pills row -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding: 0 var(--space-lg);">
+      <div class="filter-pills" style="padding:var(--space-sm) 0;">
+        <button class="filter-pill active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-pill" onclick="setFilter('reels', this)">Reels</button>
+        <button class="filter-pill" onclick="setFilter('people', this)">People</button>
+      </div>
+      <div class="ai-search-toggle" style="padding:0;">
+        <svg class="ai-toggle-sparkle" viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+        <div class="ai-toggle-switch" id="aiToggle" onclick="toggleAiSearch()"></div>
+      </div>
+    </div>
+
+    <div class="screen-content">
+
+      <!-- Default View (no search) -->
+      <div class="default-view" id="defaultView">
+        <div class="results-section" id="defaultPeople">
+          <div class="results-label">People</div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">S</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Sneha Sharma</div>
+              <div class="pr-handle">@dr_sneha · 124K followers</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">M</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Mohit Verma</div>
+              <div class="pr-handle">@dr_mohit · 98K followers</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">A</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Arjun Reddy</div>
+              <div class="pr-handle">@dr_arjun · 210K followers</div>
+            </div>
+            <button class="pr-follow-btn following" onclick="togglePrFollow(this)">Following</button>
+          </div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">L</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Lakshmi Iyer</div>
+              <div class="pr-handle">@dr_lakshmi · 67K followers</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #f5af19, #f12711);">R</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Rajesh Patel</div>
+              <div class="pr-handle">@dr_rajesh · 45K followers</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+        </div>
+
+        <div class="results-section" id="defaultReels">
+          <div class="results-label">Reels</div>
+          <div class="reels-result-grid">
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #2a1a4a 0%, #1a0a2a 100%);">
+                <div class="rrc-user">@dr_sneha</div>
+                <div class="rrc-caption">Life-saving CPR technique every family should know</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 245K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #1a2a4a 0%, #0a1a2a 100%);">
+                <div class="rrc-user">@dr_mohit</div>
+                <div class="rrc-caption">Inside our new ICU facility at Fortis Mumbai</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 182K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #1a4a2a 0%, #0a2a1a 100%);">
+                <div class="rrc-user">@dr_arjun</div>
+                <div class="rrc-caption">5 warning signs of diabetes you shouldn't ignore</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 421K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #4a2a1a 0%, #2a0a0a 100%);">
+                <div class="rrc-user">@dr_priya</div>
+                <div class="rrc-caption">Ayurvedic morning routine for better immunity</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 318K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #1a1a4a 0%, #0a0a2a 100%);">
+                <div class="rrc-user">@dr_deepak</div>
+                <div class="rrc-caption">3 successful heart surgeries in one day</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 563K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #4a1a3a 0%, #2a0a1a 100%);">
+                <div class="rrc-user">@dr_lakshmi</div>
+                <div class="rrc-caption">Pediatric care tips for new parents</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 89K</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Normal Search Results -->
+      <div class="results-view" id="resultsView">
+
+        <!-- People results -->
+        <div class="results-section" id="peopleResults">
+          <div class="results-label">People</div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">S</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Sneha Sharma</div>
+              <div class="pr-handle">@dr_sneha · 124K followers</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #11998e, #38ef7d);">S</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Sanjay Rao</div>
+              <div class="pr-handle">@dr_sanjay · 89K followers</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #f5af19, #f12711);">S</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Swati Menon</div>
+              <div class="pr-handle">@dr_swati · 56K followers</div>
+            </div>
+            <button class="pr-follow-btn following" onclick="togglePrFollow(this)">Following</button>
+          </div>
+        </div>
+
+        <!-- Reels results -->
+        <div class="results-section" id="reelResults">
+          <div class="results-label">Reels</div>
+          <div class="reels-result-grid">
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #2a1a4a 0%, #1a0a2a 100%);">
+                <div class="rrc-user">@dr_sneha</div>
+                <div class="rrc-caption">Life-saving CPR technique every family should know</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 245K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #1a2a4a 0%, #0a1a2a 100%);">
+                <div class="rrc-user">@dr_mohit</div>
+                <div class="rrc-caption">Inside our new ICU facility at Fortis Mumbai</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 182K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #1a4a2a 0%, #0a2a1a 100%);">
+                <div class="rrc-user">@dr_arjun</div>
+                <div class="rrc-caption">5 warning signs of diabetes you shouldn't ignore</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 421K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #4a2a1a 0%, #2a0a0a 100%);">
+                <div class="rrc-user">@dr_priya</div>
+                <div class="rrc-caption">Ayurvedic morning routine for better immunity</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 318K</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Search Results -->
+      <div class="ai-results-view" id="aiResultsView">
+        <div class="ai-search-header">
+          <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+          <span>AI-Powered Search</span>
+        </div>
+
+        <div class="ai-answer-card">
+          <span class="ai-answer-label">AI Answer</span>
+          <p>Based on your search, here are the most relevant results. I found <strong>3 creators</strong> and <strong>12 reels</strong> matching your query.</p>
+          <p>The top creators in this category are <strong>@dr_sneha</strong> for emergency medicine content, <strong>@dr_arjun</strong> for diabetes awareness, and <strong>@dr_priya</strong> for Ayurvedic wellness guides.</p>
+        </div>
+
+        <div class="ai-related-label">Related Creators</div>
+        <div class="results-section" style="padding-top:0;">
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">S</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Sneha Sharma</div>
+              <div class="pr-handle">@dr_sneha · Best match</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+          <div class="people-result">
+            <div class="pr-avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">A</div>
+            <div class="pr-info">
+              <div class="pr-name">Dr. Arjun Reddy</div>
+              <div class="pr-handle">@dr_arjun · 95% match</div>
+            </div>
+            <button class="pr-follow-btn" onclick="togglePrFollow(this)">Follow</button>
+          </div>
+        </div>
+
+        <div class="ai-related-label">Recommended Reels</div>
+        <div class="results-section" style="padding-top:0;">
+          <div class="reels-result-grid">
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #2a1a4a 0%, #1a0a2a 100%);">
+                <div class="rrc-user">@dr_sneha</div>
+                <div class="rrc-caption">Life-saving CPR technique every family should know</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 245K</div>
+              </div>
+            </div>
+            <div class="reel-result-card" onclick="window.location.href='home.html'">
+              <div class="rrc-bg" style="background: linear-gradient(180deg, #1a4a2a 0%, #0a2a1a 100%);">
+                <div class="rrc-user">@dr_arjun</div>
+                <div class="rrc-caption">5 warning signs of diabetes you shouldn't ignore</div>
+                <div class="rrc-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 421K</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let aiMode = false;
+    let currentFilter = 'all';
+
+    function toggleAiSearch() {
+      aiMode = !aiMode;
+      document.getElementById('aiToggle').classList.toggle('on', aiMode);
+      var input = document.getElementById('searchInput');
+      input.placeholder = aiMode ? 'Ask AI anything...' : 'Search reels, people...';
+      handleSearch();
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      applyFilter();
+    }
+
+    function applyFilter() {
+      var sections = [
+        { people: document.getElementById('defaultPeople'), reels: document.getElementById('defaultReels') },
+        { people: document.getElementById('peopleResults'), reels: document.getElementById('reelResults') }
+      ];
+      sections.forEach(function(s) {
+        if (currentFilter === 'all') {
+          s.people.style.display = 'block';
+          s.reels.style.display = 'block';
+        } else if (currentFilter === 'people') {
+          s.people.style.display = 'block';
+          s.reels.style.display = 'none';
+        } else {
+          s.people.style.display = 'none';
+          s.reels.style.display = 'block';
+        }
+      });
+    }
+
+    function handleSearch() {
+      var query = document.getElementById('searchInput').value.trim();
+      var defaultView = document.getElementById('defaultView');
+      var resultsView = document.getElementById('resultsView');
+      var aiResultsView = document.getElementById('aiResultsView');
+
+      if (query.length === 0) {
+        defaultView.style.display = 'block';
+        resultsView.style.display = 'none';
+        aiResultsView.style.display = 'none';
+        applyFilter();
+      } else if (aiMode) {
+        defaultView.style.display = 'none';
+        resultsView.style.display = 'none';
+        aiResultsView.style.display = 'block';
+      } else {
+        defaultView.style.display = 'none';
+        resultsView.style.display = 'block';
+        aiResultsView.style.display = 'none';
+        applyFilter();
+      }
+    }
+
+    function togglePrFollow(btn) {
+      btn.classList.toggle('following');
+      btn.textContent = btn.classList.contains('following') ? 'Following' : 'Follow';
+    }
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

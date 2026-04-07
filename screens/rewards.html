@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Rewards</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    /* Points summary banner */
+    .points-banner {
+      margin: var(--space-lg);
+      padding: var(--space-xl) var(--space-lg);
+      background: linear-gradient(135deg, #E94560, #533483);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .points-banner::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+
+    .points-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: -20px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+
+    .points-label {
+      font-size: var(--font-sm);
+      color: rgba(255,255,255,0.8);
+      font-weight: 500;
+    }
+
+    .points-value {
+      font-size: 44px;
+      font-weight: 800;
+      color: white;
+      margin-top: 4px;
+      line-height: 1;
+    }
+
+    .points-value span {
+      font-size: var(--font-lg);
+      font-weight: 600;
+      opacity: 0.8;
+    }
+
+    .points-subtitle {
+      font-size: var(--font-xs);
+      color: rgba(255,255,255,0.6);
+      margin-top: var(--space-sm);
+    }
+
+    /* Coin-Rupee Toggle */
+    .currency-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      background: rgba(255,255,255,0.15);
+      border-radius: var(--radius-full);
+      padding: 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .currency-toggle-btn {
+      padding: 6px 14px;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--font-xs);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-family);
+      transition: all 0.25s ease;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .currency-toggle-btn.active {
+      background: rgba(255,255,255,0.25);
+      color: white;
+    }
+
+    /* How it works row */
+    .how-it-works {
+      display: flex;
+      gap: var(--space-sm);
+      padding: 0 var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .how-item {
+      flex: 1;
+      text-align: center;
+      padding: var(--space-md) var(--space-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    .how-item-icon {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto var(--space-xs);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .how-item-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .how-item-icon.create { background: rgba(233, 69, 96, 0.15); }
+    .how-item-icon.create svg { fill: var(--accent-primary); }
+    .how-item-icon.event { background: rgba(0, 214, 143, 0.15); }
+    .how-item-icon.event svg { fill: var(--success); }
+    .how-item-icon.trophy { background: rgba(255, 215, 0, 0.15); }
+    .how-item-icon.trophy svg { fill: #FFA500; }
+
+    .how-item-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .how-item-pts {
+      font-size: var(--font-xs);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    /* Reward tabs (Unclaimed / Claimed) */
+    .reward-tabs {
+      display: flex;
+      margin: 0 var(--space-lg);
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: var(--space-md);
+    }
+
+    .reward-tab {
+      flex: 1;
+      padding: var(--space-md);
+      text-align: center;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: var(--text-muted);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .reward-tab.active {
+      color: var(--text-primary);
+    }
+
+    .reward-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--text-primary);
+    }
+
+    .reward-tab .tab-count {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+    }
+
+    .reward-tab.active .tab-count {
+      background: var(--accent-subtle);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .reward-tab-content {
+      display: none;
+    }
+
+    .reward-tab-content.active {
+      display: block;
+    }
+
+    /* Reward catalog */
+    .reward-list {
+      padding: 0 var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      padding-bottom: var(--space-xl);
+    }
+
+    .reward-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      transition: all 0.2s;
+    }
+
+    .reward-item:hover {
+      border-color: var(--border-light);
+    }
+
+    .reward-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 28px;
+    }
+
+    .reward-thumb.gift { background: linear-gradient(135deg, #FF6B6B, #EE5A24); }
+    .reward-thumb.badge { background: linear-gradient(135deg, #FFD700, #FFA500); }
+    .reward-thumb.boost { background: linear-gradient(135deg, #7B68EE, #9B59B6); }
+    .reward-thumb.frame { background: linear-gradient(135deg, #00D2FF, #3A7BD5); }
+    .reward-thumb.merch { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .reward-thumb.ad-free { background: linear-gradient(135deg, #fc4a1a, #f7b733); }
+
+    .reward-thumb svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    .reward-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .reward-name {
+      font-size: var(--font-md);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .reward-desc {
+      font-size: var(--font-xs);
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    .reward-cost {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: var(--font-xs);
+      font-weight: 700;
+      color: #FFA500;
+    }
+
+    .reward-cost svg {
+      width: 12px;
+      height: 12px;
+      fill: #FFA500;
+    }
+
+    .claim-btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      border: none;
+      font-size: var(--font-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-family);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .claim-btn.available {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .claim-btn.available:hover {
+      background: #d63a52;
+    }
+
+    .claim-btn.insufficient {
+      background: var(--bg-surface-light);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .claim-btn.claimed {
+      background: rgba(0, 214, 143, 0.15);
+      color: var(--success);
+      cursor: default;
+    }
+
+    /* Claimed date label */
+    .claimed-date {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Empty state for claimed tab */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-2xl) var(--space-lg);
+    }
+
+    .empty-state-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-md);
+    }
+
+    .empty-state-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-muted);
+    }
+
+    .empty-state-title {
+      font-size: var(--font-md);
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-desc {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* Claim modal overlay */
+    .claim-modal-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .claim-modal-overlay.show {
+      display: flex;
+    }
+
+    .claim-modal {
+      width: 300px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-xl);
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+    }
+
+    .claim-modal-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--space-lg);
+      border-radius: 50%;
+      background: rgba(78, 130, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .claim-modal-icon svg {
+      width: 32px;
+      height: 32px;
+      fill: #4E82FF;
+    }
+
+    .claim-modal h3 {
+      font-size: var(--font-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .claim-modal p {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      margin-top: var(--space-sm);
+      line-height: 1.5;
+    }
+
+    .contact-info {
+      margin-top: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      text-align: left;
+    }
+
+    .contact-row svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .contact-row-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .contact-row-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .contact-row-value {
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 1px;
+    }
+
+    .claim-modal-btn {
+      margin-top: var(--space-xl);
+      width: 100%;
+      padding: 14px;
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--font-md);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-family);
+    }
+
+    .claim-modal-btn:hover {
+      background: #d63a52;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="screen-content">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <a href="profile.html" class="back-btn">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </a>
+        <span class="top-bar-title">Iti Coins</span>
+        <div style="width: 36px;"></div>
+      </div>
+
+      <!-- Points Banner -->
+      <div class="points-banner">
+        <div class="points-label">Total Iti Coins</div>
+        <div class="points-value" id="totalPoints">2,450 <span>coins</span></div>
+        <div class="points-subtitle" id="rupeeEquiv" style="display:none;">Equivalent to <strong>245.00</strong></div>
+        <div class="points-subtitle" id="earnMore">Keep watching & creating to earn more!</div>
+
+        <!-- Coins / Rupees toggle -->
+        <div class="currency-toggle">
+          <button class="currency-toggle-btn active" id="toggleCoins" onclick="showCoins()">Coins</button>
+          <button class="currency-toggle-btn" id="toggleRupees" onclick="showRupees()">&#8377; Rupees</button>
+        </div>
+      </div>
+
+      <!-- How to Earn -->
+      <div class="section-header">
+        <span class="section-title">How to Earn</span>
+      </div>
+      <div class="how-it-works">
+        <div class="how-item">
+          <div class="how-item-icon create">
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          </div>
+          <div class="how-item-label">Create Reels</div>
+          <div class="how-item-pts">+25 coins</div>
+        </div>
+        <div class="how-item">
+          <div class="how-item-icon event">
+            <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          </div>
+          <div class="how-item-label">Join Events</div>
+          <div class="how-item-pts">+50 coins</div>
+        </div>
+        <div class="how-item">
+          <div class="how-item-icon trophy">
+            <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+          </div>
+          <div class="how-item-label">Event Top 3</div>
+          <div class="how-item-pts">+500 coins</div>
+        </div>
+      </div>
+
+      <!-- Reward Tabs -->
+      <div class="reward-tabs">
+        <button class="reward-tab active" data-rewardtab="unclaimed">
+          Unclaimed
+          <span class="tab-count">5</span>
+        </button>
+        <button class="reward-tab" data-rewardtab="claimed">
+          Claimed
+          <span class="tab-count">3</span>
+        </button>
+      </div>
+
+      <!-- Unclaimed Coins -->
+      <div class="reward-tab-content active" id="rewardtab-unclaimed">
+        <div class="reward-list">
+          <!-- 1: Event Top 3 -->
+          <div class="reward-item">
+            <div class="reward-thumb badge">
+              <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Top 3 — Free Health Checkup Camp</div>
+              <div class="reward-desc">Your reel ranked #2 by views in this event</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +500 coins
+              </div>
+            </div>
+            <button class="claim-btn available" onclick="openClaimModal('Top 3 — Free Health Checkup Camp', 500)">Claim</button>
+          </div>
+
+          <!-- 2: Created Reel for Event -->
+          <div class="reward-item">
+            <div class="reward-thumb boost">
+              <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Event Reel — Blood Donation Drive</div>
+              <div class="reward-desc">Posted a reel for this event</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +25 coins
+              </div>
+            </div>
+            <button class="claim-btn available" onclick="openClaimModal('Event Reel — Blood Donation Drive', 25)">Claim</button>
+          </div>
+
+          <!-- 3: Joined Event -->
+          <div class="reward-item">
+            <div class="reward-thumb frame">
+              <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Joined — Mental Health Awareness Workshop</div>
+              <div class="reward-desc">Earned for joining this event</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +50 coins
+              </div>
+            </div>
+            <button class="claim-btn available" onclick="openClaimModal('Joined — Mental Health Awareness Workshop', 50)">Claim</button>
+          </div>
+
+          <!-- 4: Milestone - 50 Reels -->
+          <div class="reward-item">
+            <div class="reward-thumb merch">
+              <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Milestone — 50 Reels Created</div>
+              <div class="reward-desc">Bonus for creating your 50th reel</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +200 coins
+              </div>
+            </div>
+            <button class="claim-btn available" onclick="openClaimModal('Milestone — 50 Reels Created', 200)">Claim</button>
+          </div>
+
+          <!-- 5: Created Reel -->
+          <div class="reward-item">
+            <div class="reward-thumb boost">
+              <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Created Reel — Diabetes Awareness</div>
+              <div class="reward-desc">Earned for publishing an approved reel</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +25 coins
+              </div>
+            </div>
+            <button class="claim-btn available" onclick="openClaimModal('Created Reel — Diabetes Awareness', 25)">Claim</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claimed (Redeemed) Coins -->
+      <div class="reward-tab-content" id="rewardtab-claimed">
+        <div class="reward-list">
+          <!-- Claimed 1: Event Top 3 -->
+          <div class="reward-item">
+            <div class="reward-thumb badge">
+              <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Top 3 — National Medical Reels Summit</div>
+              <div class="reward-desc">Your reel ranked #1 by views in this event</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +500 coins
+              </div>
+              <div class="claimed-date">Redeemed on Mar 10, 2026</div>
+            </div>
+            <button class="claim-btn claimed" disabled>Redeemed</button>
+          </div>
+
+          <!-- Claimed 2: Milestone -->
+          <div class="reward-item">
+            <div class="reward-thumb merch">
+              <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Milestone — 25 Reels Created</div>
+              <div class="reward-desc">Bonus for creating your 25th reel</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +100 coins
+              </div>
+              <div class="claimed-date">Redeemed on Feb 22, 2026</div>
+            </div>
+            <button class="claim-btn claimed" disabled>Redeemed</button>
+          </div>
+
+          <!-- Claimed 3: Joined Event -->
+          <div class="reward-item">
+            <div class="reward-thumb frame">
+              <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            </div>
+            <div class="reward-details">
+              <div class="reward-name">Joined — Healthcare Heroes Awards Night</div>
+              <div class="reward-desc">Earned for joining this event</div>
+              <div class="reward-cost">
+                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+                +50 coins
+              </div>
+              <div class="claimed-date">Redeemed on Jan 15, 2026</div>
+            </div>
+            <button class="claim-btn claimed" disabled>Redeemed</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+      <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Home</span></a>
+      <a class="tab-item" href="news.html"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><span>News</span></a>
+      <a class="tab-item ai-tab-btn" href="iti-ai.html"><div class="ai-tab-btn-inner"><svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg></div></a>
+      <a class="tab-item" href="events.html"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg><span>Events</span></a>
+      <a class="tab-item active" href="profile.html"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Profile</span></a>
+    </nav>
+
+    <!-- Claim Contact Modal -->
+    <div class="claim-modal-overlay" id="claimModal">
+      <div class="claim-modal">
+        <div class="claim-modal-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <h3 id="modalTitle">Redeem Iti Coins</h3>
+        <p id="modalDesc">To redeem your coins, please contact us via:</p>
+
+        <div class="contact-info">
+          <div class="contact-row">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            <div class="contact-row-text">
+              <div class="contact-row-label">Mobile</div>
+              <div class="contact-row-value">+91 98765 43210</div>
+            </div>
+          </div>
+          <div class="contact-row">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <div class="contact-row-text">
+              <div class="contact-row-label">Email</div>
+              <div class="contact-row-value">rewards@itibachok.com</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="claim-modal-btn" onclick="closeModal()">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var totalCoins = 2450;
+    var coinToRupee = 0.10; // 1 coin = 0.10 rupees
+    var showingRupees = false;
+
+    function formatNum(num) {
+      return num.toLocaleString();
+    }
+
+    function showCoins() {
+      showingRupees = false;
+      document.getElementById('toggleCoins').classList.add('active');
+      document.getElementById('toggleRupees').classList.remove('active');
+      document.getElementById('totalPoints').innerHTML = formatNum(totalCoins) + ' <span>coins</span>';
+      document.getElementById('rupeeEquiv').style.display = 'none';
+      document.getElementById('earnMore').style.display = 'block';
+    }
+
+    function showRupees() {
+      showingRupees = true;
+      document.getElementById('toggleRupees').classList.add('active');
+      document.getElementById('toggleCoins').classList.remove('active');
+      var rupees = (totalCoins * coinToRupee).toFixed(2);
+      document.getElementById('totalPoints').innerHTML = '&#8377;' + rupees;
+      document.getElementById('rupeeEquiv').style.display = 'block';
+      document.getElementById('rupeeEquiv').innerHTML = 'Equivalent to <strong>' + formatNum(totalCoins) + ' Iti Coins</strong>';
+      document.getElementById('earnMore').style.display = 'none';
+    }
+
+    // Reward tab switching
+    document.querySelectorAll('.reward-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.reward-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.reward-tab-content').forEach(function(c) { c.classList.remove('active'); });
+        tab.classList.add('active');
+        document.getElementById('rewardtab-' + tab.dataset.rewardtab).classList.add('active');
+      });
+    });
+
+    // Claim modal
+    function openClaimModal(name, coins) {
+      document.getElementById('modalTitle').textContent = 'Redeem Coins';
+      document.getElementById('modalDesc').textContent = 'To redeem your ' + formatNum(coins) + ' coins from "' + name + '", please contact us:';
+      document.getElementById('claimModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('claimModal').classList.remove('show');
+    }
+
+    // Close modal on overlay click
+    document.getElementById('claimModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

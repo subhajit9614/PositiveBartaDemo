@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Profile</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .profile-header {
+      position: relative;
+      padding-bottom: var(--space-lg);
+    }
+
+    .profile-banner {
+      height: 120px;
+      background: linear-gradient(135deg, #1a1a4e 0%, #4e1a3a 50%, #1a3a4e 100%);
+      position: relative;
+    }
+
+    .profile-avatar-section {
+      display: flex;
+      align-items: flex-end;
+      padding: 0 var(--space-lg);
+      margin-top: -40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .profile-avatar-wrapper {
+      position: relative;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: 4px solid var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-2xl);
+      font-weight: 800;
+      color: white;
+    }
+
+    .profile-top-actions {
+      position: absolute;
+      top: 68px;
+      right: var(--space-lg);
+      display: flex;
+      gap: var(--space-sm);
+      z-index: 3;
+    }
+
+    .profile-top-actions .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    .profile-top-actions .icon-btn svg { width: 18px; height: 18px; fill: var(--text-primary); }
+
+    .profile-info {
+      padding: var(--space-md) var(--space-lg) 0;
+    }
+
+    .profile-name { font-size: var(--font-xl); font-weight: 700; }
+    .profile-username { font-size: var(--font-sm); color: var(--text-secondary); margin-top: 2px; }
+    .profile-bio {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-top: var(--space-sm);
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: var(--space-2xl);
+      padding: var(--space-lg) var(--space-lg);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .stat-value { font-size: var(--font-xl); font-weight: 800; color: var(--text-primary); }
+    .stat-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+
+    .profile-actions {
+      display: flex;
+      gap: var(--space-sm);
+      padding: 0 var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .profile-actions .btn { flex: 1; padding: 10px; }
+
+    /* Content tabs */
+    .content-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .content-tab {
+      flex: 1;
+      padding: var(--space-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: none;
+      cursor: pointer;
+      position: relative;
+      color: var(--text-muted);
+      font-family: var(--font-family);
+      font-size: var(--font-sm);
+      font-weight: 600;
+      gap: 6px;
+    }
+
+    .content-tab svg { width: 18px; height: 18px; fill: var(--text-muted); }
+
+    .content-tab.active { color: var(--text-primary); }
+    .content-tab.active svg { fill: var(--text-primary); }
+
+    .content-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--text-primary);
+    }
+
+    .content-tab .tab-count {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+    }
+
+    .content-tab.active .tab-count {
+      background: var(--accent-subtle);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    /* Tab content */
+    .reel-tab-content { display: none; }
+    .reel-tab-content.active { display: block; }
+
+    /* Video grid */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      padding: 2px;
+    }
+
+    .video-thumb {
+      aspect-ratio: 9/16;
+      background: var(--bg-surface);
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      transition: opacity 0.2s;
+    }
+
+    .video-thumb:hover { opacity: 0.8; }
+
+    .video-thumb-bg {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-thumb-bg svg { width: 20px; height: 20px; fill: rgba(255,255,255,0.15); }
+
+    .video-thumb-bg.t1 { background: linear-gradient(135deg, #1a2a3a, #2a1a3a); }
+    .video-thumb-bg.t2 { background: linear-gradient(135deg, #2a3a1a, #3a1a2a); }
+    .video-thumb-bg.t3 { background: linear-gradient(135deg, #3a2a1a, #1a3a2a); }
+    .video-thumb-bg.t4 { background: linear-gradient(135deg, #1a1a3a, #3a1a1a); }
+    .video-thumb-bg.t5 { background: linear-gradient(135deg, #2a1a1a, #1a2a2a); }
+    .video-thumb-bg.t6 { background: linear-gradient(135deg, #3a3a1a, #1a1a2a); }
+    .video-thumb-bg.t7 { background: linear-gradient(135deg, #1a3a1a, #2a2a3a); }
+    .video-thumb-bg.t8 { background: linear-gradient(135deg, #2a2a1a, #1a2a3a); }
+    .video-thumb-bg.t9 { background: linear-gradient(135deg, #3a1a3a, #1a3a3a); }
+
+    .video-thumb-views {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .video-thumb-views svg { width: 12px; height: 12px; fill: white; }
+
+    /* Coin badge on approved reels */
+    .video-thumb-reward {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #FFD700;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .video-thumb-reward svg { width: 12px; height: 12px; fill: #FFD700; }
+
+    /* Pending label on pending reels */
+    .video-thumb-pending {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+    }
+
+    .pending-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #FFB74D;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .pending-label .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #FFB74D;
+      display: inline-block;
+    }
+
+    /* Rewards Card */
+    .rewards-card {
+      margin: 0 var(--space-lg) var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .rewards-card:hover {
+      border-color: var(--accent-primary);
+      background: var(--hover-overlay-strong);
+    }
+
+    .rewards-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rewards-icon svg {
+      width: 26px;
+      height: 26px;
+      fill: #fff;
+    }
+
+    .rewards-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rewards-label {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .rewards-points {
+      font-size: var(--font-xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    .rewards-points span {
+      font-size: var(--font-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .rewards-action {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 14px;
+      background: var(--accent-subtle);
+      color: var(--accent-primary);
+      border-radius: var(--radius-full);
+      font-size: var(--font-sm);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .rewards-action svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--accent-primary);
+    }
+
+    /* Share Profile Sheet */
+    @keyframes sheetSlideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    @keyframes sheetSlideDown {
+      from { transform: translateY(0); }
+      to { transform: translateY(100%); }
+    }
+
+    .share-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 500;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .share-overlay.show {
+      display: flex;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
+    .share-sheet {
+      width: 100%;
+      background: var(--bg-primary);
+      border-radius: 20px 20px 0 0;
+      padding: 0 0 calc(var(--space-xl) + 20px) 0;
+      animation: sheetSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .share-overlay.closing .share-sheet {
+      animation: sheetSlideDown 0.35s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    }
+    .share-sheet-handle {
+      width: 36px; height: 4px; background: var(--text-muted); border-radius: 2px;
+      margin: 10px auto 0;
+    }
+    .share-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+    }
+    .share-title {
+      font-size: var(--font-lg); font-weight: 700; color: var(--text-primary);
+    }
+    .share-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--bg-input); border: none;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .share-close svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+
+    .share-profile-card {
+      display: flex; align-items: center; gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      margin: 0 var(--space-lg) var(--space-md);
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+    }
+    .share-profile-card .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--font-md); font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .share-profile-card-info {
+      flex: 1; min-width: 0;
+    }
+    .share-profile-card-name {
+      font-size: var(--font-md); font-weight: 600; color: var(--text-primary);
+    }
+    .share-profile-card-handle {
+      font-size: var(--font-xs); color: var(--text-muted);
+    }
+
+    .share-section-label {
+      font-size: var(--font-xs); font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: var(--space-sm) var(--space-lg);
+    }
+    .share-external-row {
+      display: flex; gap: 16px; padding: var(--space-sm) var(--space-lg);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .share-external-row::-webkit-scrollbar { display: none; }
+    .share-ext-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; min-width: 64px; cursor: pointer;
+    }
+    .share-ext-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .share-ext-icon svg { width: 24px; height: 24px; }
+    .share-ext-icon.whatsapp { background: #25D366; }
+    .share-ext-icon.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .share-ext-icon.twitter { background: #000; }
+    .share-ext-icon.facebook { background: #1877F2; }
+    .share-ext-icon.copy-link { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    .share-ext-icon.copy-link svg { fill: var(--text-primary); }
+    .share-ext-icon.more { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    .share-ext-icon.more svg { fill: var(--text-primary); }
+    .share-ext-label {
+      font-size: 10px; color: var(--text-secondary);
+      text-align: center; white-space: nowrap;
+    }
+
+    .share-toast {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: var(--success, #22c55e); color: white;
+      padding: 10px 24px; border-radius: var(--radius-full);
+      font-size: var(--font-sm); font-weight: 600;
+      z-index: 600; opacity: 0; transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .share-toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="screen-content">
+      <div class="profile-header">
+        <div class="profile-banner"></div>
+
+        <div class="profile-top-actions">
+          <a href="settings.html" class="icon-btn">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          </a>
+        </div>
+
+        <div class="profile-avatar-section">
+          <div class="profile-avatar-wrapper">
+            <div class="profile-avatar">J</div>
+          </div>
+        </div>
+
+        <div class="profile-info">
+          <div class="profile-name">Dr. Jayesh Kumar</div>
+          <div class="profile-username">@dr_jayesh</div>
+          <div class="profile-bio">Cardiologist & health educator. Spreading medical awareness one reel at a time. Based in Mumbai.</div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-value">128</span>
+            <span class="stat-label">Posts</span>
+          </div>
+          <a href="followers.html" class="stat-item" style="text-decoration:none;">
+            <span class="stat-value">14.2K</span>
+            <span class="stat-label">Followers</span>
+          </a>
+          <a href="followers.html" class="stat-item" style="text-decoration:none;">
+            <span class="stat-value">892</span>
+            <span class="stat-label">Following</span>
+          </a>
+          <a href="events.html" class="stat-item" style="text-decoration:none;" onclick="localStorage.setItem('eventsTab','my')">
+            <span class="stat-value">12</span>
+            <span class="stat-label">Events</span>
+          </a>
+        </div>
+
+        <div class="profile-actions">
+          <a href="edit-profile.html" class="btn btn-secondary btn-sm" style="flex:1; text-decoration:none; text-align:center;">Edit Profile</a>
+          <button class="btn btn-secondary btn-sm" style="flex: 0; padding: 8px 14px;" onclick="openShareSheet()">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="var(--text-primary)"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Rewards Card -->
+      <a href="rewards.html" class="rewards-card">
+        <div class="rewards-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+        </div>
+        <div class="rewards-info">
+          <div class="rewards-label">Iti Coins</div>
+          <div class="rewards-points">2,450 <span>coins</span></div>
+        </div>
+        <div class="rewards-action">
+          Claim
+          <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        </div>
+      </a>
+
+      <!-- Content Tabs -->
+      <div class="content-tabs">
+        <button class="content-tab active" data-reeltab="approved">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          Approved
+          <span class="tab-count">9</span>
+        </button>
+        <button class="content-tab" data-reeltab="pending">
+          <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          Pending
+          <span class="tab-count">2</span>
+        </button>
+      </div>
+
+      <!-- Approved Reels Grid -->
+      <div class="reel-tab-content active" id="reeltab-approved">
+        <div class="video-grid">
+          <div class="video-thumb">
+            <div class="video-thumb-bg t1"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 150</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 12.4K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t2"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 80</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 8.9K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t3"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 250</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 23.1K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t4"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 45</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 5.6K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t5"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 320</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 45.2K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t6"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 60</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 3.2K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t7"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 180</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 67.8K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t8"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 95</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 1.1K</div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t9"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-reward"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg> 110</div>
+            <div class="video-thumb-views"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 15.9K</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Reels Grid -->
+      <div class="reel-tab-content" id="reeltab-pending">
+        <div class="video-grid">
+          <div class="video-thumb">
+            <div class="video-thumb-bg t3"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-pending"><span class="pending-label"><span class="dot"></span> Pending</span></div>
+          </div>
+          <div class="video-thumb">
+            <div class="video-thumb-bg t7"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-thumb-pending"><span class="pending-label"><span class="dot"></span> Pending</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+      <a class="tab-item" href="home.html">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </a>
+      <a class="tab-item" href="news.html">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <span>News</span>
+      </a>
+      <a class="tab-item ai-tab-btn" href="iti-ai.html">
+        <div class="ai-tab-btn-inner">
+          <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+        </div>
+      </a>
+      <a class="tab-item" href="events.html">
+        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        <span>Events</span>
+      </a>
+      <a class="tab-item active" href="profile.html">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- Share Profile Overlay -->
+    <div class="share-overlay" id="shareOverlay" onclick="closeShareSheet(event)">
+      <div class="share-sheet" onclick="event.stopPropagation()">
+        <div class="share-sheet-handle"></div>
+        <div class="share-header">
+          <div class="share-title">Share Profile</div>
+          <button class="share-close" onclick="closeShareSheet(event)">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
+        <div class="share-profile-card">
+          <div class="avatar">J</div>
+          <div class="share-profile-card-info">
+            <div class="share-profile-card-name">Dr. Jayesh Kumar</div>
+            <div class="share-profile-card-handle">@dr_jayesh</div>
+          </div>
+        </div>
+        <div class="share-section-label">Share to</div>
+        <div class="share-external-row">
+          <div class="share-ext-item">
+            <div class="share-ext-icon whatsapp">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </div>
+            <div class="share-ext-label">WhatsApp</div>
+          </div>
+          <div class="share-ext-item">
+            <div class="share-ext-icon instagram">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </div>
+            <div class="share-ext-label">Instagram</div>
+          </div>
+          <div class="share-ext-item">
+            <div class="share-ext-icon twitter">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+            <div class="share-ext-label">X</div>
+          </div>
+          <div class="share-ext-item">
+            <div class="share-ext-icon facebook">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </div>
+            <div class="share-ext-label">Facebook</div>
+          </div>
+          <div class="share-ext-item" onclick="copyShareLink(this)">
+            <div class="share-ext-icon copy-link">
+              <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+            </div>
+            <div class="share-ext-label">Copy Link</div>
+          </div>
+          <div class="share-ext-item">
+            <div class="share-ext-icon more">
+              <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+            </div>
+            <div class="share-ext-label">More</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="share-toast" id="shareToast">Copied!</div>
+  </div>
+
+  <script>
+    // Reel tab switching (Approved / Pending)
+    document.querySelectorAll('.content-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.reel-tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('reeltab-' + tab.dataset.reeltab).classList.add('active');
+      });
+    });
+
+    // Share Profile Sheet
+    function openShareSheet() {
+      const overlay = document.getElementById('shareOverlay');
+      overlay.classList.remove('closing');
+      overlay.classList.add('show');
+    }
+
+    function closeShareSheet(e) {
+      const overlay = document.getElementById('shareOverlay');
+      overlay.classList.add('closing');
+      setTimeout(() => {
+        overlay.classList.remove('show', 'closing');
+      }, 350);
+    }
+
+    function copyShareLink(item) {
+      const toast = document.getElementById('shareToast');
+      toast.textContent = 'Profile link copied!';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

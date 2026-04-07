@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - News</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .news-card {
+      margin: 0 var(--space-lg) var(--space-lg);
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .news-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .news-thumbnail {
+      width: 100%;
+      height: 180px;
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .news-thumbnail svg { width: 40px; height: 40px; fill: var(--text-muted); opacity: 0.3; }
+
+    .news-thumbnail.thumb-1 { background: linear-gradient(135deg, #1a2a4a, #2a1a3a); }
+    .news-thumbnail.thumb-2 { background: linear-gradient(135deg, #2a3a1a, #1a3a2a); }
+    .news-thumbnail.thumb-3 { background: linear-gradient(135deg, #3a1a1a, #3a2a1a); }
+    .news-thumbnail.thumb-4 { background: linear-gradient(135deg, #1a3a3a, #2a2a3a); }
+
+    .news-category-badge {
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-sm);
+      padding: 4px 10px;
+      background: rgba(0,0,0,0.6);
+      border-radius: var(--radius-full);
+      font-size: var(--font-xs);
+      color: white;
+      backdrop-filter: blur(4px);
+    }
+
+    .news-body {
+      padding: var(--space-lg);
+    }
+
+    .news-source {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .news-source-dot {
+      width: 4px;
+      height: 4px;
+      background: var(--text-muted);
+      border-radius: 50%;
+    }
+
+    .news-headline {
+      font-size: var(--font-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin-bottom: var(--space-sm);
+    }
+
+    .news-excerpt {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .news-pills {
+      display: flex; padding: 0 var(--space-lg); gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .news-pill {
+      padding: 8px 20px; border-radius: var(--radius-full);
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      font-size: var(--font-sm); font-weight: 600; color: var(--text-secondary);
+      cursor: pointer; white-space: nowrap; font-family: var(--font-family);
+      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    }
+
+    .news-pill.active { background: var(--accent-primary); border-color: var(--accent-primary); color: white; }
+
+    .news-pill svg { width: 14px; height: 14px; fill: currentColor; }
+
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="top-bar">
+      <span class="top-bar-title">News</span>
+    </div>
+
+    <!-- News Pills -->
+    <div class="news-pills">
+      <button class="news-pill active" data-feed="ai" onclick="switchNewsFeed(this)">
+        <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+        AI Generated
+      </button>
+      <button class="news-pill" data-feed="positive" onclick="switchNewsFeed(this)">Positive Barta</button>
+    </div>
+
+    <div class="screen-content">
+      <!-- AI Generated News -->
+      <div class="news-card" data-feed="ai" onclick="window.location.href='news-detail.html'">
+        <div class="news-thumbnail thumb-1">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span class="news-category-badge">Medical Research</span>
+        </div>
+        <div class="news-body">
+          <div class="news-source">
+            <span>AI Summary</span>
+            <span class="news-source-dot"></span>
+            <span>2h ago</span>
+          </div>
+          <div class="news-headline">AIIMS Delhi Develops AI-Powered Early Cancer Detection System</div>
+          <div class="news-excerpt">Researchers at AIIMS Delhi have created an AI model that detects early-stage cancers with 94% accuracy, potentially saving lakhs of lives across India...</div>
+        </div>
+      </div>
+
+      <div class="news-card" data-feed="ai" onclick="window.location.href='news-detail.html'">
+        <div class="news-thumbnail thumb-2">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span class="news-category-badge">Public Health</span>
+        </div>
+        <div class="news-body">
+          <div class="news-source">
+            <span>AI Summary</span>
+            <span class="news-source-dot"></span>
+            <span>4h ago</span>
+          </div>
+          <div class="news-headline">India's Ayushman Bharat Scheme Reaches 50 Crore Beneficiaries</div>
+          <div class="news-excerpt">The world's largest government-funded healthcare programme hits a major milestone, providing free treatment to over 50 crore citizens across India...</div>
+        </div>
+      </div>
+
+      <div class="news-card" data-feed="ai" onclick="window.location.href='news-detail.html'">
+        <div class="news-thumbnail thumb-3">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span class="news-category-badge">Medical Innovation</span>
+        </div>
+        <div class="news-body">
+          <div class="news-source">
+            <span>AI Summary</span>
+            <span class="news-source-dot"></span>
+            <span>6h ago</span>
+          </div>
+          <div class="news-headline">IIT Bombay Creates Low-Cost Portable Ventilator for Rural Hospitals</div>
+          <div class="news-excerpt">A team of biomedical engineers at IIT Bombay has developed a portable ventilator costing under Rs 50,000, designed for primary health centres in rural India...</div>
+        </div>
+      </div>
+
+      <!-- Positive Barta News (hidden by default) -->
+      <div class="news-card" data-feed="positive" style="display:none;" onclick="window.location.href='news-detail.html'">
+        <div class="news-thumbnail thumb-4">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span class="news-category-badge">Community</span>
+        </div>
+        <div class="news-body">
+          <div class="news-source">
+            <span>Positive Barta</span>
+            <span class="news-source-dot"></span>
+            <span>1h ago</span>
+          </div>
+          <div class="news-headline">Village Nurse Walks 15 km Daily to Vaccinate Children in Rural Odisha</div>
+          <div class="news-excerpt">Rina Behera from Kalahandi has been walking through remote tribal villages for 12 years, ensuring no child misses their vaccination schedule...</div>
+        </div>
+      </div>
+
+      <div class="news-card" data-feed="positive" style="display:none;" onclick="window.location.href='news-detail.html'">
+        <div class="news-thumbnail thumb-1">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span class="news-category-badge">Kindness</span>
+        </div>
+        <div class="news-body">
+          <div class="news-source">
+            <span>Positive Barta</span>
+            <span class="news-source-dot"></span>
+            <span>3h ago</span>
+          </div>
+          <div class="news-headline">Stranger Pays Off Entire Village's Medical Debt Anonymously</div>
+          <div class="news-excerpt">An anonymous donor cleared outstanding hospital bills for 120 families in a small village, restoring hope and trust in humanity...</div>
+        </div>
+      </div>
+
+      <div class="news-card" data-feed="positive" style="display:none;" onclick="window.location.href='news-detail.html'">
+        <div class="news-thumbnail thumb-2">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span class="news-category-badge">Inspiration</span>
+        </div>
+        <div class="news-body">
+          <div class="news-source">
+            <span>Positive Barta</span>
+            <span class="news-source-dot"></span>
+            <span>5h ago</span>
+          </div>
+          <div class="news-headline">78-Year-Old Cancer Survivor Completes Her First Marathon in Kolkata</div>
+          <div class="news-excerpt">Kamala Devi, who beat breast cancer at 72, crossed the finish line at the Tata Mumbai Marathon, inspiring thousands of cancer patients across India...</div>
+        </div>
+      </div>
+
+      <div style="height: 20px;"></div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+      <a class="tab-item" href="home.html">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </a>
+      <a class="tab-item active" href="news.html">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <span>News</span>
+      </a>
+      <a class="tab-item ai-tab-btn" href="iti-ai.html">
+        <div class="ai-tab-btn-inner">
+          <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+        </div>
+      </a>
+      <a class="tab-item" href="events.html">
+        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        <span>Events</span>
+      </a>
+      <a class="tab-item" href="profile.html">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="../js/theme.js"></script>
+  <script>
+    // News feed pill toggle
+    function switchNewsFeed(pill) {
+      document.querySelectorAll('.news-pill').forEach(function(p) { p.classList.remove('active'); });
+      pill.classList.add('active');
+      var feed = pill.getAttribute('data-feed');
+      document.querySelectorAll('.news-card').forEach(function(card) {
+        card.style.display = card.getAttribute('data-feed') === feed ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

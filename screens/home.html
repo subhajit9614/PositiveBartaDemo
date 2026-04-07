@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Home</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .phone-frame { background: var(--bg-primary); }
+
+    .reels-container {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .reel {
+      position: absolute;
+      inset: 0;
+      display: none;
+    }
+
+    .reel.active { display: block; }
+
+    /* Video element */
+    .reel-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #000;
+    }
+
+    /* Top overlay */
+    .reel-top-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: var(--space-md) var(--space-lg);
+      padding-top: 60px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .reel-logo {
+      font-size: var(--font-xl);
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .reel-top-actions {
+      display: flex;
+      gap: var(--space-md);
+    }
+
+    .reel-top-actions button {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .reel-top-actions button svg { width: 20px; height: 20px; fill: white; }
+
+    .notif-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      font-size: 9px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    /* Right side actions */
+    .reel-actions {
+      position: absolute;
+      right: 12px;
+      bottom: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      z-index: 10;
+    }
+
+    .reel-action-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .reel-action-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      transition: transform 0.2s;
+    }
+
+    .reel-action-icon:active { transform: scale(1.2); }
+    .reel-action-icon svg { width: 28px; height: 28px; fill: white; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
+    .reel-action-count { font-size: 11px; color: white; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+
+    .reel-action-item.liked .reel-action-icon svg { fill: var(--accent-primary); }
+
+    .reel-user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      border: 2px solid white;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .reel-user-avatar .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+
+    /* Bottom overlay - User info */
+    .reel-bottom-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 70px;
+      padding: var(--space-lg);
+      padding-bottom: 90px;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      z-index: 10;
+    }
+
+    .reel-username {
+      font-size: var(--font-md);
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .reel-user-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .reel-follow-btn {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.7);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-family);
+      padding: 4px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .reel-follow-btn.following {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.7);
+    }
+
+    .reel-caption {
+      font-size: var(--font-sm);
+      color: rgba(255,255,255,0.9);
+      margin-top: 6px;
+      line-height: 1.4;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .reel-caption .hashtag { color: #7B8CFF; font-weight: 600; }
+
+    /* Progress bar */
+    .reel-progress {
+      position: absolute;
+      bottom: 76px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255,255,255,0.2);
+      z-index: 15;
+    }
+
+    .reel-progress-fill {
+      height: 100%;
+      background: white;
+      border-radius: 1px;
+      width: 35%;
+      transition: width 0.1s;
+    }
+
+    /* Pause indicator */
+    .pause-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      backdrop-filter: blur(4px);
+    }
+
+    .pause-indicator.show { display: flex; }
+    .pause-indicator svg { width: 32px; height: 32px; fill: white; }
+
+    /* Double tap heart */
+    .double-tap-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    .double-tap-heart.show {
+      animation: heartPop 0.8s ease-out forwards;
+    }
+
+    .double-tap-heart svg { width: 80px; height: 80px; fill: var(--accent-primary); }
+
+    @keyframes heartPop {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
+    /* Swipe hint */
+    .swipe-hint {
+      position: absolute;
+      bottom: 96px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.4);
+      font-size: var(--font-xs);
+      z-index: 10;
+      animation: fadeInOut 3s ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      30%, 70% { opacity: 1; }
+    }
+
+    /* Tab bar override for full-screen */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-tab-bar);
+      border-top: 1px solid var(--border-color);
+      z-index: 30;
+    }
+
+    /* Feed toggle (For You / Following) */
+    .feed-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      position: relative;
+    }
+
+    .feed-toggle-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: var(--font-md);
+      font-weight: 600;
+      font-family: var(--font-family);
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .feed-toggle-btn.active {
+      color: white;
+    }
+
+    .feed-toggle-indicator {
+      position: absolute;
+      bottom: -2px;
+      height: 2.5px;
+      background: white;
+      border-radius: 2px;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* AI Summarize button */
+    .ai-icon svg {
+      fill: url(#aiGrad) !important;
+      filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.5)) !important;
+    }
+
+    .ai-summarize .reel-action-count {
+      background: linear-gradient(90deg, #a855f7, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+
+    /* AI Summary overlay */
+    .ai-summary-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.0);
+      backdrop-filter: blur(0px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      transition: background 0.4s ease, backdrop-filter 0.4s ease;
+    }
+
+    .ai-summary-overlay.show {
+      display: flex;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .ai-summary-sheet {
+      width: 100%;
+      max-width: 393px;
+      background: var(--bg-primary);
+      border-radius: 20px 20px 0 0;
+      padding: var(--space-lg) var(--space-xl);
+      padding-bottom: calc(var(--space-xl) + 20px);
+      height: 88vh;
+      overflow-y: auto;
+      animation: sheetSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .ai-summary-overlay.closing .ai-summary-sheet {
+      animation: sheetSlideDown 0.35s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    }
+
+    @keyframes sheetSlideUp {
+      0% { transform: translateY(100%); opacity: 0.5; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes sheetSlideDown {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100%); opacity: 0; }
+    }
+
+    .ai-summary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-lg);
+    }
+
+    .ai-summary-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: var(--font-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .ai-summary-title svg {
+      width: 22px;
+      height: 22px;
+      fill: #a855f7;
+    }
+
+    .ai-summary-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-input);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .ai-summary-close svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-secondary);
+    }
+
+    .ai-summary-body {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .ai-summary-body .ai-label {
+      display: inline-block;
+      background: linear-gradient(90deg, #a855f7, #6366f1);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ai-summary-body p {
+      margin-bottom: var(--space-sm);
+      color: var(--text-primary);
+    }
+
+    .ai-summary-body .ai-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: var(--space-md);
+    }
+
+    .ai-summary-body .ai-tag {
+      background: var(--accent-subtle);
+      color: var(--accent-primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    /* Share Sheet overlay */
+    .share-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.0);
+      backdrop-filter: blur(0px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      transition: background 0.4s ease, backdrop-filter 0.4s ease;
+    }
+
+    .share-overlay.show {
+      display: flex;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .share-sheet {
+      width: 100%;
+      max-width: 393px;
+      background: var(--bg-primary);
+      border-radius: 20px 20px 0 0;
+      padding: 0 0 calc(var(--space-xl) + 20px) 0;
+      max-height: 72vh;
+      overflow-y: auto;
+      animation: sheetSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .share-overlay.closing .share-sheet {
+      animation: sheetSlideDown 0.35s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    }
+
+    .share-sheet-handle {
+      width: 36px; height: 4px; background: var(--text-muted); border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    .share-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .share-title {
+      font-size: var(--font-lg); font-weight: 700; color: var(--text-primary);
+    }
+
+    .share-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--bg-input); border: none;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+
+    .share-close svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+
+    /* Search bar inside share sheet */
+    .share-search {
+      padding: 0 var(--space-lg) var(--space-md);
+    }
+
+    .share-search input {
+      width: 100%; padding: 10px 14px 10px 36px;
+      background: var(--bg-input); border: 1px solid var(--border-color);
+      border-radius: var(--radius-full); color: var(--text-primary);
+      font-size: var(--font-sm); font-family: var(--font-family); outline: none;
+    }
+
+    .share-search input::placeholder { color: var(--text-muted); }
+
+    .share-search-wrap {
+      position: relative;
+    }
+
+    .share-search-wrap svg {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; fill: var(--text-muted);
+    }
+
+    /* In-app users horizontal scroll */
+    .share-section-label {
+      font-size: var(--font-xs); font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: var(--space-sm) var(--space-lg);
+    }
+
+    .share-users-row {
+      display: flex; gap: 16px; padding: var(--space-sm) var(--space-lg);
+      overflow-x: auto; scrollbar-width: none;
+    }
+
+    .share-users-row::-webkit-scrollbar { display: none; }
+
+    .share-user-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; min-width: 64px; cursor: pointer;
+    }
+
+    .share-user-item .avatar {
+      width: 48px; height: 48px; font-size: 16px;
+    }
+
+    .share-user-name {
+      font-size: 10px; color: var(--text-secondary);
+      max-width: 64px; text-align: center;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .share-send-btn {
+      background: var(--accent-primary); border: none;
+      color: white; font-size: 10px; font-weight: 700;
+      font-family: var(--font-family);
+      padding: 4px 12px; border-radius: var(--radius-full);
+      cursor: pointer; transition: all 0.2s;
+    }
+
+    .share-send-btn.sent {
+      background: var(--success, #22c55e);
+    }
+
+    /* Divider */
+    .share-divider {
+      height: 1px; background: var(--border-color);
+      margin: var(--space-md) var(--space-lg);
+    }
+
+    /* External share row */
+    .share-external-row {
+      display: flex; gap: 16px; padding: var(--space-sm) var(--space-lg);
+      overflow-x: auto; scrollbar-width: none;
+    }
+
+    .share-external-row::-webkit-scrollbar { display: none; }
+
+    .share-ext-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; min-width: 64px; cursor: pointer;
+    }
+
+    .share-ext-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+
+    .share-ext-icon svg { width: 24px; height: 24px; }
+
+    .share-ext-icon.whatsapp { background: #25D366; }
+    .share-ext-icon.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .share-ext-icon.twitter { background: #000; }
+    .share-ext-icon.facebook { background: #1877F2; }
+    .share-ext-icon.copy-link { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    .share-ext-icon.copy-link svg { fill: var(--text-primary); }
+    .share-ext-icon.more { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    .share-ext-icon.more svg { fill: var(--text-primary); }
+
+    .share-ext-label {
+      font-size: 10px; color: var(--text-secondary);
+      text-align: center; white-space: nowrap;
+    }
+
+    /* Sent toast */
+    .share-toast {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: var(--success, #22c55e); color: white;
+      padding: 10px 24px; border-radius: var(--radius-full);
+      font-size: var(--font-sm); font-weight: 600;
+      z-index: 200; opacity: 0; transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .share-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <!-- SVG gradient for AI icon -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#a855f7"/>
+        <stop offset="100%" stop-color="#6366f1"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- AI Summary Overlay -->
+  <div class="ai-summary-overlay" id="aiOverlay" onclick="closeAiSummary(event)">
+    <div class="ai-summary-sheet" onclick="event.stopPropagation()">
+      <div class="ai-summary-header">
+        <div class="ai-summary-title">
+          <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+          AI Summary
+        </div>
+        <button class="ai-summary-close" onclick="closeAiSummary()">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </div>
+      <div class="ai-summary-body" id="aiSummaryBody"></div>
+    </div>
+  </div>
+
+  <!-- Share Sheet Overlay -->
+  <div class="share-overlay" id="shareOverlay" onclick="closeShareSheet(event)">
+    <div class="share-sheet" onclick="event.stopPropagation()">
+      <div class="share-sheet-handle"></div>
+      <div class="share-header">
+        <div class="share-title">Share</div>
+        <button class="share-close" onclick="closeShareSheet()">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </div>
+      <div class="share-search">
+        <div class="share-search-wrap">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" placeholder="Search people...">
+        </div>
+      </div>
+      <div class="share-section-label">Send to</div>
+      <div class="share-users-row">
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_mohit">M</div>
+          <div class="share-user-name">@dr_mohit</div>
+          <button class="share-send-btn" onclick="sendShareToUser(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_arjun">A</div>
+          <div class="share-user-name">@dr_arjun</div>
+          <button class="share-send-btn" onclick="sendShareToUser(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_priya">P</div>
+          <div class="share-user-name">@dr_priya</div>
+          <button class="share-send-btn" onclick="sendShareToUser(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_lakshmi">L</div>
+          <div class="share-user-name">@dr_lakshmi</div>
+          <button class="share-send-btn" onclick="sendShareToUser(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_rajesh">R</div>
+          <div class="share-user-name">@dr_rajesh</div>
+          <button class="share-send-btn" onclick="sendShareToUser(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_kavita">K</div>
+          <div class="share-user-name">@dr_kavita</div>
+          <button class="share-send-btn" onclick="sendShareToUser(this)">Send</button>
+        </div>
+      </div>
+      <div class="share-divider"></div>
+      <div class="share-section-label">Share to</div>
+      <div class="share-external-row">
+        <div class="share-ext-item">
+          <div class="share-ext-icon whatsapp">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </div>
+          <div class="share-ext-label">WhatsApp</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon instagram">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </div>
+          <div class="share-ext-label">Instagram</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon twitter">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <div class="share-ext-label">X</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon facebook">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </div>
+          <div class="share-ext-label">Facebook</div>
+        </div>
+        <div class="share-ext-item" onclick="copyShareLink(this)">
+          <div class="share-ext-icon copy-link">
+            <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+          </div>
+          <div class="share-ext-label">Copy Link</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon more">
+            <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </div>
+          <div class="share-ext-label">More</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="share-toast" id="shareToast">Sent!</div>
+
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="position: absolute; top: 0; left: 0; right: 0; z-index: 50;">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z" fill="white"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" fill="white"/></svg>
+      </span>
+    </div>
+
+    <div class="reels-container">
+      <!-- Reel 1 -->
+      <div class="reel active" id="reel-1">
+        <video class="reel-video" src="https://videos.pexels.com/video-files/8417476/8417476-sd_540_960_30fps.mp4" autoplay loop muted playsinline></video>
+
+        <div class="reel-top-overlay">
+          <div class="feed-toggle">
+            <button class="feed-toggle-btn active" onclick="switchFeed('foryou', this)">For You</button>
+            <button class="feed-toggle-btn" onclick="switchFeed('following', this)">Following</button>
+            <div class="feed-toggle-indicator"></div>
+          </div>
+          <div class="reel-top-actions">
+            <a href="create.html" class="reel-top-create-btn" title="Create Reel">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </a>
+            <button onclick="window.location.href='search.html'">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <button onclick="window.location.href='notifications.html'" style="position:relative;">
+              <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+              <span class="notif-badge">3</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right-side actions -->
+        <div class="reel-actions">
+          <div class="reel-action-item">
+            <div class="reel-user-avatar" onclick="window.location.href='profile.html'">
+              <div class="avatar" data-username="dr_sneha">S</div>
+            </div>
+          </div>
+
+          <div class="reel-action-item liked" onclick="toggleLike(this)">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <span class="reel-action-count">24.5K</span>
+          </div>
+
+          <div class="reel-action-item" onclick="window.location.href='comments.html'">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/></svg>
+            </div>
+            <span class="reel-action-count">1,234</span>
+          </div>
+
+          <div class="reel-action-item" onclick="openShareSheet()">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </div>
+            <span class="reel-action-count">Share</span>
+          </div>
+
+          <div class="reel-action-item ai-summarize" onclick="showAiSummary(0)">
+            <div class="reel-action-icon ai-icon">
+              <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+            </div>
+            <span class="reel-action-count">AI</span>
+          </div>
+
+        </div>
+
+        <!-- Bottom overlay -->
+        <div class="reel-bottom-overlay">
+          <div class="reel-user-row">
+            <div class="reel-username">@dr_sneha</div>
+            <button class="reel-follow-btn" onclick="toggleFollowBtn(this)">Follow</button>
+          </div>
+          <div class="reel-caption">
+            Life-saving CPR technique every family should know <span class="hashtag">#healthcare</span> <span class="hashtag">#cpr</span> <span class="hashtag">#medicalreels</span>
+          </div>
+
+        </div>
+
+        <div class="reel-progress">
+          <div class="reel-progress-fill"></div>
+        </div>
+
+        <div class="pause-indicator">
+          <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </div>
+
+        <div class="double-tap-heart">
+          <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+
+        <div class="swipe-hint">Swipe up for next</div>
+      </div>
+
+      <!-- Reel 2 -->
+      <div class="reel" id="reel-2">
+        <video class="reel-video" src="https://videos.pexels.com/video-files/29279025/12628755_540_960_30fps.mp4" loop muted playsinline preload="auto"></video>
+
+        <div class="reel-top-overlay">
+          <div class="feed-toggle">
+            <button class="feed-toggle-btn active" onclick="switchFeed('foryou', this)">For You</button>
+            <button class="feed-toggle-btn" onclick="switchFeed('following', this)">Following</button>
+            <div class="feed-toggle-indicator"></div>
+          </div>
+          <div class="reel-top-actions">
+            <a href="create.html" class="reel-top-create-btn" title="Create Reel">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </a>
+            <button onclick="window.location.href='search.html'">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <button onclick="window.location.href='notifications.html'" style="position:relative;">
+              <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+              <span class="notif-badge">3</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="reel-actions">
+          <div class="reel-action-item">
+            <div class="reel-user-avatar" onclick="window.location.href='profile.html'">
+              <div class="avatar" data-username="dr_mohit">M</div>
+            </div>
+          </div>
+
+          <div class="reel-action-item" onclick="toggleLike(this)">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <span class="reel-action-count">18.2K</span>
+          </div>
+
+          <div class="reel-action-item" onclick="window.location.href='comments.html'">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/></svg>
+            </div>
+            <span class="reel-action-count">892</span>
+          </div>
+
+          <div class="reel-action-item" onclick="openShareSheet()">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </div>
+            <span class="reel-action-count">Share</span>
+          </div>
+
+          <div class="reel-action-item ai-summarize" onclick="showAiSummary(1)">
+            <div class="reel-action-icon ai-icon">
+              <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+            </div>
+            <span class="reel-action-count">AI</span>
+          </div>
+        </div>
+
+        <div class="reel-bottom-overlay">
+          <div class="reel-user-row">
+            <div class="reel-username">@dr_mohit</div>
+            <button class="reel-follow-btn" onclick="toggleFollowBtn(this)">Follow</button>
+          </div>
+          <div class="reel-caption">
+            Inside our new ICU facility at Fortis Mumbai <span class="hashtag">#hospital</span> <span class="hashtag">#icu</span> <span class="hashtag">#healthcare</span>
+          </div>
+
+        </div>
+
+        <div class="reel-progress">
+          <div class="reel-progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Reel 3 -->
+      <div class="reel" id="reel-3">
+        <video class="reel-video" src="https://videos.pexels.com/video-files/6171973/6171973-sd_540_960_30fps.mp4" loop muted playsinline preload="auto"></video>
+
+        <div class="reel-top-overlay">
+          <div class="feed-toggle">
+            <button class="feed-toggle-btn active" onclick="switchFeed('foryou', this)">For You</button>
+            <button class="feed-toggle-btn" onclick="switchFeed('following', this)">Following</button>
+            <div class="feed-toggle-indicator"></div>
+          </div>
+          <div class="reel-top-actions">
+            <a href="create.html" class="reel-top-create-btn" title="Create Reel">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </a>
+            <button onclick="window.location.href='search.html'">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <button onclick="window.location.href='notifications.html'" style="position:relative;">
+              <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+              <span class="notif-badge">3</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="reel-actions">
+          <div class="reel-action-item">
+            <div class="reel-user-avatar" onclick="window.location.href='profile.html'">
+              <div class="avatar" data-username="dr_arjun">A</div>
+            </div>
+          </div>
+
+          <div class="reel-action-item" onclick="toggleLike(this)">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <span class="reel-action-count">42.1K</span>
+          </div>
+
+          <div class="reel-action-item" onclick="window.location.href='comments.html'">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/></svg>
+            </div>
+            <span class="reel-action-count">3,456</span>
+          </div>
+
+          <div class="reel-action-item" onclick="openShareSheet()">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </div>
+            <span class="reel-action-count">Share</span>
+          </div>
+
+          <div class="reel-action-item ai-summarize" onclick="showAiSummary(2)">
+            <div class="reel-action-icon ai-icon">
+              <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+            </div>
+            <span class="reel-action-count">AI</span>
+          </div>
+        </div>
+
+        <div class="reel-bottom-overlay">
+          <div class="reel-user-row">
+            <div class="reel-username">@dr_arjun</div>
+            <button class="reel-follow-btn" onclick="toggleFollowBtn(this)">Follow</button>
+          </div>
+          <div class="reel-caption">
+            5 warning signs of diabetes you shouldn't ignore <span class="hashtag">#diabetes</span> <span class="hashtag">#healthtips</span> <span class="hashtag">#medicalreels</span>
+          </div>
+
+        </div>
+
+        <div class="reel-progress">
+          <div class="reel-progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Reel 4 -->
+      <div class="reel" id="reel-4">
+        <video class="reel-video" src="https://videos.pexels.com/video-files/4111496/4111496-sd_540_960_30fps.mp4" loop muted playsinline preload="auto"></video>
+
+        <div class="reel-top-overlay">
+          <div class="feed-toggle">
+            <button class="feed-toggle-btn active" onclick="switchFeed('foryou', this)">For You</button>
+            <button class="feed-toggle-btn" onclick="switchFeed('following', this)">Following</button>
+            <div class="feed-toggle-indicator"></div>
+          </div>
+          <div class="reel-top-actions">
+            <a href="create.html" class="reel-top-create-btn" title="Create Reel">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </a>
+            <button onclick="window.location.href='search.html'">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <button onclick="window.location.href='notifications.html'" style="position:relative;">
+              <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+              <span class="notif-badge">3</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="reel-actions">
+          <div class="reel-action-item">
+            <div class="reel-user-avatar" onclick="window.location.href='profile.html'">
+              <div class="avatar" data-username="dr_priya">P</div>
+            </div>
+          </div>
+
+          <div class="reel-action-item" onclick="toggleLike(this)">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <span class="reel-action-count">31.8K</span>
+          </div>
+
+          <div class="reel-action-item" onclick="window.location.href='comments.html'">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/></svg>
+            </div>
+            <span class="reel-action-count">2,105</span>
+          </div>
+
+          <div class="reel-action-item" onclick="openShareSheet()">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </div>
+            <span class="reel-action-count">Share</span>
+          </div>
+
+          <div class="reel-action-item ai-summarize" onclick="showAiSummary(3)">
+            <div class="reel-action-icon ai-icon">
+              <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+            </div>
+            <span class="reel-action-count">AI</span>
+          </div>
+        </div>
+
+        <div class="reel-bottom-overlay">
+          <div class="reel-user-row">
+            <div class="reel-username">@dr_priya</div>
+            <button class="reel-follow-btn" onclick="toggleFollowBtn(this)">Follow</button>
+          </div>
+          <div class="reel-caption">
+            Ayurvedic morning routine for better immunity <span class="hashtag">#ayurveda</span> <span class="hashtag">#immunity</span> <span class="hashtag">#wellness</span>
+          </div>
+
+        </div>
+
+        <div class="reel-progress">
+          <div class="reel-progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Reel 5 -->
+      <div class="reel" id="reel-5">
+        <video class="reel-video" src="https://videos.pexels.com/video-files/11500789/11500789-sd_540_960_30fps.mp4" loop muted playsinline preload="auto"></video>
+
+        <div class="reel-top-overlay">
+          <div class="feed-toggle">
+            <button class="feed-toggle-btn active" onclick="switchFeed('foryou', this)">For You</button>
+            <button class="feed-toggle-btn" onclick="switchFeed('following', this)">Following</button>
+            <div class="feed-toggle-indicator"></div>
+          </div>
+          <div class="reel-top-actions">
+            <a href="create.html" class="reel-top-create-btn" title="Create Reel">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </a>
+            <button onclick="window.location.href='search.html'">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <button onclick="window.location.href='notifications.html'" style="position:relative;">
+              <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+              <span class="notif-badge">3</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="reel-actions">
+          <div class="reel-action-item">
+            <div class="reel-user-avatar" onclick="window.location.href='profile.html'">
+              <div class="avatar" data-username="dr_deepak">D</div>
+            </div>
+          </div>
+
+          <div class="reel-action-item liked" onclick="toggleLike(this)">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <span class="reel-action-count">56.3K</span>
+          </div>
+
+          <div class="reel-action-item" onclick="window.location.href='comments.html'">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/></svg>
+            </div>
+            <span class="reel-action-count">4,721</span>
+          </div>
+
+          <div class="reel-action-item" onclick="openShareSheet()">
+            <div class="reel-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </div>
+            <span class="reel-action-count">Share</span>
+          </div>
+
+          <div class="reel-action-item ai-summarize" onclick="showAiSummary(4)">
+            <div class="reel-action-icon ai-icon">
+              <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+            </div>
+            <span class="reel-action-count">AI</span>
+          </div>
+        </div>
+
+        <div class="reel-bottom-overlay">
+          <div class="reel-user-row">
+            <div class="reel-username">@dr_deepak</div>
+            <button class="reel-follow-btn" onclick="toggleFollowBtn(this)">Follow</button>
+          </div>
+          <div class="reel-caption">
+            How we performed 3 successful heart surgeries in one day <span class="hashtag">#cardiology</span> <span class="hashtag">#surgery</span> <span class="hashtag">#healthcare</span>
+          </div>
+
+        </div>
+
+        <div class="reel-progress">
+          <div class="reel-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+      <a class="tab-item active" href="home.html">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </a>
+      <a class="tab-item" href="news.html">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <span>News</span>
+      </a>
+      <a class="tab-item ai-tab-btn" href="iti-ai.html">
+        <div class="ai-tab-btn-inner">
+          <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+        </div>
+      </a>
+      <a class="tab-item" href="events.html">
+        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        <span>Events</span>
+      </a>
+      <a class="tab-item" href="profile.html">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    // --- Feed Toggle ---
+    function positionIndicator(btn) {
+      var toggle = btn.closest('.feed-toggle');
+      var indicator = toggle.querySelector('.feed-toggle-indicator');
+      var toggleRect = toggle.getBoundingClientRect();
+      var btnRect = btn.getBoundingClientRect();
+      indicator.style.left = (btnRect.left - toggleRect.left) + 'px';
+      indicator.style.width = btnRect.width + 'px';
+    }
+
+    // Initialize indicator after layout is ready
+    setTimeout(function() {
+      var activeReel = document.querySelector('.reel.active .feed-toggle');
+      if (activeReel) {
+        var activeBtn = activeReel.querySelector('.feed-toggle-btn.active');
+        if (activeBtn) positionIndicator(activeBtn);
+      }
+    }, 100);
+
+    function syncToggleIndicators() {
+      setTimeout(function() {
+        var activeReel = document.querySelector('.reel.active .feed-toggle');
+        if (activeReel) {
+          var activeBtn = activeReel.querySelector('.feed-toggle-btn.active');
+          if (activeBtn) positionIndicator(activeBtn);
+        }
+      }, 50);
+    }
+
+    let currentFeed = 'foryou';
+
+    function switchFeed(feed, btn) {
+      debugger;
+      currentFeed = feed;
+      document.querySelectorAll('.feed-toggle').forEach(function(toggle) {
+        toggle.querySelectorAll('.feed-toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+        var target = feed === 'foryou' ? toggle.querySelector('.feed-toggle-btn:nth-child(1)') : toggle.querySelector('.feed-toggle-btn:nth-child(2)');
+        target.classList.add('active');
+      });
+      positionIndicator(btn);
+    }
+
+    // --- Avatar color from username hash ---
+    const avatarGradients = [
+      'linear-gradient(135deg, #667eea, #764ba2)',
+      'linear-gradient(135deg, #f093fb, #f5576c)',
+      'linear-gradient(135deg, #4facfe, #00f2fe)',
+      'linear-gradient(135deg, #f5af19, #f12711)',
+      'linear-gradient(135deg, #11998e, #38ef7d)',
+      'linear-gradient(135deg, #fc5c7d, #6a82fb)',
+      'linear-gradient(135deg, #f7971e, #ffd200)',
+      'linear-gradient(135deg, #00c6ff, #0072ff)'
+    ];
+
+    function getAvatarColor(username) {
+      let hash = 0;
+      for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return avatarGradients[Math.abs(hash) % avatarGradients.length];
+    }
+
+    document.querySelectorAll('.avatar[data-username]').forEach(el => {
+      el.style.background = getAvatarColor(el.dataset.username);
+    });
+
+    let currentReel = 0;
+    const reels = document.querySelectorAll('.reel');
+    let lastTap = 0;
+    let isPaused = false;
+
+    // --- Video playback management ---
+    function playReel(index) {
+      reels.forEach((reel, i) => {
+        const video = reel.querySelector('video');
+        if (!video) return;
+        if (i === index) {
+          video.currentTime = 0;
+          // Ensure video is ready to play before calling play
+          if (video.readyState >= 2) {
+            video.play().catch(() => {});
+          } else {
+            video.addEventListener('canplay', function onCanPlay() {
+              video.removeEventListener('canplay', onCanPlay);
+              video.play().catch(() => {});
+            });
+            video.load();
+          }
+        } else {
+          video.pause();
+        }
+      });
+      isPaused = false;
+      updatePauseIndicator();
+    }
+
+    function togglePause() {
+      const video = reels[currentReel].querySelector('video');
+      if (!video) return;
+      if (video.paused) {
+        video.play().catch(() => {});
+        isPaused = false;
+      } else {
+        video.pause();
+        isPaused = true;
+      }
+      updatePauseIndicator();
+    }
+
+    function updatePauseIndicator() {
+      const indicator = reels[currentReel].querySelector('.pause-indicator');
+      if (indicator) {
+        indicator.classList.toggle('show', isPaused);
+      }
+    }
+
+    // --- Progress bar tracking ---
+    function trackProgress() {
+      const video = reels[currentReel].querySelector('video');
+      const fill = reels[currentReel].querySelector('.reel-progress-fill');
+      if (video && fill && video.duration) {
+        const pct = (video.currentTime / video.duration) * 100;
+        fill.style.width = pct + '%';
+      }
+      requestAnimationFrame(trackProgress);
+    }
+    requestAnimationFrame(trackProgress);
+
+    // --- Swipe detection ---
+    let startY = 0;
+    let didSwipe = false;
+    const container = document.querySelector('.reels-container');
+
+    container.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; didSwipe = false; }, { passive: true });
+    container.addEventListener('mousedown', (e) => { startY = e.clientY; didSwipe = false; });
+
+    container.addEventListener('touchend', (e) => { handleSwipe(e.changedTouches[0].clientY); });
+    container.addEventListener('mouseup', (e) => { handleSwipe(e.clientY); });
+
+    function handleSwipe(endY) {
+      const diff = startY - endY;
+      if (Math.abs(diff) > 50) {
+        didSwipe = true;
+        if (diff > 0 && currentReel < reels.length - 1) {
+          currentReel++;
+        } else if (diff < 0 && currentReel > 0) {
+          currentReel--;
+        }
+        reels.forEach(r => r.classList.remove('active'));
+        reels[currentReel].classList.add('active');
+        playReel(currentReel);
+        requestAnimationFrame(syncToggleIndicators);
+      }
+    }
+
+    // --- Tap to pause / double-tap to like ---
+    let tapTimeout = null;
+    container.addEventListener('click', (e) => {
+      // Ignore clicks on action buttons/links
+      if (e.target.closest('.reel-actions') || e.target.closest('.reel-top-overlay') || e.target.closest('.tab-bar')) return;
+
+      // Ignore click if it was triggered by a swipe gesture
+      if (didSwipe) { didSwipe = false; return; }
+
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        // Double tap → like heart animation
+        clearTimeout(tapTimeout);
+        const heart = reels[currentReel].querySelector('.double-tap-heart');
+        if (heart) {
+          heart.classList.remove('show');
+          void heart.offsetWidth;
+          heart.classList.add('show');
+        }
+      } else {
+        // Single tap → toggle pause (delayed to distinguish from double-tap)
+        tapTimeout = setTimeout(() => {
+          togglePause();
+        }, 310);
+      }
+      lastTap = now;
+    });
+
+    function toggleLike(el) {
+      el.classList.toggle('liked');
+    }
+
+    function toggleFollowBtn(btn) {
+      btn.classList.toggle('following');
+      btn.textContent = btn.classList.contains('following') ? 'Following' : 'Follow';
+    }
+
+    // Start playing reel 1 on load
+    playReel(0);
+
+    // --- AI Summary ---
+    const aiSummaries = [
+      {
+        user: '@dr_sneha',
+        summary: 'Dr. Sneha Sharma demonstrates the correct CPR technique step by step, explaining hand placement, compression depth, and rescue breathing — essential knowledge for every Indian household.',
+        mood: 'Educational & Urgent',
+        tags: ['CPR', 'First Aid', 'Emergency', 'Healthcare']
+      },
+      {
+        user: '@dr_mohit',
+        summary: 'A walkthrough of the newly inaugurated ICU wing at Fortis Hospital Mumbai, showcasing state-of-the-art ventilators, monitoring systems, and the dedicated nursing staff on duty.',
+        mood: 'Informative & Proud',
+        tags: ['ICU', 'Fortis Mumbai', 'Hospital Tour', 'Critical Care']
+      },
+      {
+        user: '@dr_arjun',
+        summary: 'Dr. Arjun Reddy explains five early warning signs of Type 2 diabetes that are commonly overlooked in India — including frequent thirst, blurred vision, and slow wound healing.',
+        mood: 'Awareness & Preventive',
+        tags: ['Diabetes', 'Warning Signs', 'Prevention', 'Health Tips']
+      },
+      {
+        user: '@dr_priya',
+        summary: 'Dr. Priya Nair shares a traditional Ayurvedic morning routine including warm turmeric water, oil pulling, and pranayama breathing to naturally boost immunity.',
+        mood: 'Holistic & Calming',
+        tags: ['Ayurveda', 'Immunity', 'Morning Routine', 'Wellness']
+      },
+      {
+        user: '@dr_deepak',
+        summary: 'Dr. Deepak Joshi recounts an extraordinary day at Apollo Hospital where his cardiology team performed three back-to-back open-heart surgeries, all with successful outcomes.',
+        mood: 'Inspiring & Resilient',
+        tags: ['Heart Surgery', 'Cardiology', 'Apollo Hospital', 'Medical Team']
+      }
+    ];
+
+    function showAiSummary(reelIndex) {
+      const data = aiSummaries[reelIndex];
+      const body = document.getElementById('aiSummaryBody');
+      body.innerHTML = '<span class="ai-label">AI Generated</span>' +
+        '<p><strong>' + data.user + '</strong></p>' +
+        '<p>' + data.summary + '</p>' +
+        '<p style="color:var(--text-secondary);font-size:12px;"><strong>Mood:</strong> ' + data.mood + '</p>' +
+        '<div class="ai-tags">' + data.tags.map(function(t) { return '<span class="ai-tag">' + t + '</span>'; }).join('') + '</div>';
+      document.getElementById('aiOverlay').classList.add('show');
+    }
+
+    function closeAiSummary(e) {
+      const overlay = document.getElementById('aiOverlay');
+      if (!e || e.target === overlay) {
+        overlay.classList.add('closing');
+        setTimeout(function() {
+          overlay.classList.remove('show', 'closing');
+        }, 350);
+      }
+    }
+
+    // --- Share Sheet ---
+    function openShareSheet() {
+      var overlay = document.getElementById('shareOverlay');
+      overlay.classList.add('show');
+      // Apply avatar colors to share sheet avatars
+      overlay.querySelectorAll('.avatar[data-username]').forEach(function(el) {
+        el.style.background = getAvatarColor(el.dataset.username);
+      });
+    }
+
+    function closeShareSheet(e) {
+      var overlay = document.getElementById('shareOverlay');
+      if (!e || e.target === overlay) {
+        overlay.classList.add('closing');
+        setTimeout(function() {
+          overlay.classList.remove('show', 'closing');
+          // Reset all send buttons
+          overlay.querySelectorAll('.share-send-btn').forEach(function(btn) {
+            btn.classList.remove('sent');
+            btn.textContent = 'Send';
+          });
+        }, 350);
+      }
+    }
+
+    function sendShareToUser(btn) {
+      btn.classList.add('sent');
+      btn.textContent = 'Sent!';
+      var toast = document.getElementById('shareToast');
+      var name = btn.closest('.share-user-item').querySelector('.share-user-name').textContent;
+      toast.textContent = 'Reel sent to ' + name;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2000);
+    }
+
+    function copyShareLink(item) {
+      var label = item.querySelector('.share-ext-label');
+      label.textContent = 'Copied!';
+      setTimeout(function() { label.textContent = 'Copy Link'; }, 2000);
+    }
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

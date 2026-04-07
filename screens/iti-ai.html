@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Iti AI</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .screen-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Disclaimer bar */
+    .disclaimer-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px var(--space-lg);
+      background: rgba(255, 170, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 170, 0, 0.2);
+      font-size: 10px;
+      color: var(--warning);
+      flex-shrink: 0;
+    }
+    .disclaimer-bar svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--warning);
+      flex-shrink: 0;
+    }
+
+    /* Beta badge in top bar */
+    .beta-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--accent-subtle);
+      color: var(--accent-primary);
+      border-radius: var(--radius-full);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .top-bar-title svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--accent-primary);
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    /* Chat area */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    /* Welcome section */
+    .welcome-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: var(--space-xl) 0 var(--space-md);
+    }
+
+    .ai-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+    }
+    .ai-avatar svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    .welcome-title {
+      font-size: var(--font-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .welcome-desc {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 260px;
+    }
+
+    /* Quick action chips */
+    .quick-actions {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: center;
+      margin: var(--space-lg) 0 var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .quick-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-family);
+    }
+    .quick-chip:hover {
+      border-color: var(--accent-primary);
+      background: var(--accent-subtle);
+    }
+    .quick-chip svg {
+      width: 16px;
+      height: 16px;
+    }
+    .quick-chip.health svg { fill: #4facfe; }
+    .quick-chip.symptom svg { fill: #f97316; }
+
+    /* Suggested prompts */
+    .suggested-section {
+      margin-top: var(--space-sm);
+    }
+    .suggested-label {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+    .suggested-prompts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .suggested-prompt {
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      font-family: var(--font-family);
+    }
+    .suggested-prompt:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      background: var(--hover-overlay);
+    }
+
+    /* Chat messages */
+    .chat-msg {
+      display: flex;
+      gap: var(--space-sm);
+      max-width: 88%;
+      animation: msgFadeIn 0.3s ease;
+    }
+    @keyframes msgFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+    .msg-avatar.ai {
+      background: var(--accent-gradient);
+    }
+    .msg-avatar.ai svg {
+      width: 14px;
+      height: 14px;
+      fill: white;
+    }
+    .msg-avatar.human {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: var(--font-sm);
+      line-height: 1.6;
+    }
+    .chat-msg.ai .msg-bubble {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-top-left-radius: 4px;
+    }
+    .chat-msg.user .msg-bubble {
+      background: var(--accent-primary);
+      color: white;
+      border-top-right-radius: 4px;
+    }
+
+    .msg-disclaimer {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-color);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .msg-disclaimer svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .msg-specialist {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(79, 172, 254, 0.1);
+      border: 1px solid rgba(79, 172, 254, 0.2);
+      border-radius: var(--radius-md);
+      font-size: var(--font-xs);
+      color: #4facfe;
+      font-weight: 600;
+    }
+    .msg-specialist svg {
+      width: 16px;
+      height: 16px;
+      fill: #4facfe;
+      flex-shrink: 0;
+    }
+
+    .find-doctor-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: var(--accent-subtle);
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-full);
+      font-size: var(--font-xs);
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-family);
+      transition: all 0.2s;
+    }
+    .find-doctor-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+    }
+    .find-doctor-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 12px 16px;
+      align-items: center;
+    }
+    .typing-indicator span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: typingBounce 1.4s ease-in-out infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Input area */
+    .chat-input-area {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      padding-bottom: calc(var(--space-md) + 20px);
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      flex-shrink: 0;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-full);
+      color: var(--text-primary);
+      font-size: var(--font-sm);
+      font-family: var(--font-family);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus {
+      border-color: var(--accent-primary);
+    }
+    .chat-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+    .send-btn:hover { opacity: 0.85; }
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+
+    /* Toast */
+    .ai-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-xs);
+      font-weight: 600;
+      z-index: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .ai-toast.show { opacity: 1; }
+
+    /* Follow-up suggestions after AI reply */
+    .followup-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .followup-prompt {
+      padding: 6px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-family);
+      transition: all 0.2s;
+    }
+    .followup-prompt:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+    <div class="top-bar">
+      <a href="javascript:history.back()" class="back-btn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+      <span class="top-bar-title"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>Iti AI<span class="beta-badge">Beta</span></span>
+      <div style="width: 36px;"></div>
+    </div>
+    <div class="screen-content">
+      <!-- Disclaimer -->
+      <div class="disclaimer-bar">
+        <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        <span>For informational purposes only. Always consult a doctor.</span>
+      </div>
+
+      <!-- Chat area -->
+      <div class="chat-area" id="chatArea">
+        <!-- Welcome -->
+        <div class="welcome-section" id="welcomeSection">
+          <div class="ai-avatar">
+            <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+          </div>
+          <div class="welcome-title">Hi, I'm Iti AI</div>
+          <div class="welcome-desc">Your health assistant. Ask me medical questions or describe your symptoms.</div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="quick-actions" id="quickActions">
+          <button class="quick-chip health" onclick="selectChip('health')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+            Health Q&A
+          </button>
+          <button class="quick-chip symptom" onclick="selectChip('symptom')">
+            <svg viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>
+            Symptom Guide
+          </button>
+        </div>
+
+        <!-- Suggested prompts -->
+        <div class="suggested-section" id="suggestedSection">
+          <div class="suggested-label">Try asking</div>
+          <div class="suggested-prompts">
+            <button class="suggested-prompt" onclick="sendMessage('What are the top news stories today?')">What are the top news stories today?</button>
+            <button class="suggested-prompt" onclick="sendMessage('What causes high blood pressure?')">What causes high blood pressure?</button>
+            <button class="suggested-prompt" onclick="sendMessage('How to manage diabetes at home?')">How to manage diabetes at home?</button>
+            <button class="suggested-prompt" onclick="sendMessage('I have headache and fever for 2 days')">I have headache and fever for 2 days</button>
+             <button class="suggested-prompt" onclick="sendMessage('What does high cholesterol mean?')">What does high cholesterol mean?</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask Iti AI..." onkeydown="if(event.key==='Enter')sendFromInput()">
+        <button class="send-btn" onclick="sendFromInput()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-toast" id="aiToast">Coming soon!</div>
+
+  <script>
+    var cannedResponses = {
+      'What causes high blood pressure?': {
+        type: 'health',
+        text: 'High blood pressure (hypertension) can be caused by several factors:\n\n<b>Common causes:</b>\n- Excess salt (sodium) intake\n- Lack of physical activity\n- Being overweight or obese\n- Stress and anxiety\n- Genetics and family history\n- Smoking and excess alcohol\n\n<b>Medical conditions:</b>\n- Kidney disease\n- Thyroid disorders\n- Sleep apnea\n\nRegular monitoring and lifestyle changes can help manage blood pressure effectively.',
+        followups: ['What is a normal BP range?', 'How to lower BP naturally?']
+      },
+      'How to manage diabetes at home?': {
+        type: 'health',
+        text: 'Managing diabetes at home involves several key habits:\n\n<b>Diet:</b>\n- Eat balanced meals with controlled carbohydrates\n- Choose whole grains over refined foods\n- Include plenty of vegetables and lean protein\n\n<b>Lifestyle:</b>\n- Exercise regularly (30 min daily)\n- Monitor blood sugar levels as advised\n- Take medications on time\n- Stay hydrated\n\n<b>Watch for warning signs:</b>\n- Unusual thirst or frequent urination\n- Blurred vision or fatigue\n- Slow-healing wounds',
+        followups: ['Best foods for diabetics?', 'When to see a doctor?']
+      },
+      'I have headache and fever for 2 days': {
+        type: 'symptom',
+        text: 'Headache with fever lasting 2 days could indicate several conditions:\n\n<b>Common causes:</b>\n- Viral infection (flu, common cold)\n- Sinusitis\n- Dengue or other tropical fevers\n- Dehydration\n\n<b>What you can do now:</b>\n- Stay hydrated, rest well\n- Take paracetamol for fever (as per usual dosage)\n- Monitor your temperature\n\n<b>See a doctor if:</b>\n- Fever exceeds 103\u00b0F (39.4\u00b0C)\n- Symptoms worsen or new symptoms appear\n- Stiff neck or rash develops',
+        specialist: 'General Physician / Internal Medicine',
+        followups: ['What tests might I need?', 'Is it contagious?']
+      },
+      'What does high cholesterol mean?': {
+        type: 'health',
+        text: 'High cholesterol means there is too much cholesterol in your blood, which can increase your risk of heart disease.\n\n<b>Types:</b>\n- <b>LDL (bad cholesterol):</b> builds up in artery walls\n- <b>HDL (good cholesterol):</b> helps remove LDL\n- <b>Triglycerides:</b> another type of fat in blood\n\n<b>Risk factors:</b>\n- Unhealthy diet (saturated fats)\n- Lack of exercise\n- Smoking\n- Genetics\n\n<b>Normal ranges:</b>\n- Total cholesterol: below 200 mg/dL\n- LDL: below 100 mg/dL\n- HDL: above 40 mg/dL',
+        followups: ['Foods that lower cholesterol?', 'Do I need medication?']
+      }
+    };
+
+    var fallbackResponse = {
+      type: 'health',
+      text: 'I understand your concern. While I can provide general health information, this specific question would be best answered by a qualified medical professional who can consider your complete health history.\n\nWould you like me to help you find a doctor?',
+      followups: ['Find a doctor near me', 'Ask another question']
+    };
+
+    var hasStarted = false;
+
+    function hideWelcome() {
+      if (!hasStarted) {
+        hasStarted = true;
+        var welcome = document.getElementById('welcomeSection');
+        var quickActions = document.getElementById('quickActions');
+        var suggested = document.getElementById('suggestedSection');
+        if (welcome) welcome.style.display = 'none';
+        if (quickActions) quickActions.style.display = 'none';
+        if (suggested) suggested.style.display = 'none';
+      }
+    }
+
+    function selectChip(type) {
+      if (type === 'health') {
+        sendMessage('What causes high blood pressure?');
+      } else {
+        sendMessage('I have headache and fever for 2 days');
+      }
+    }
+
+    function sendFromInput() {
+      var input = document.getElementById('chatInput');
+      var text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      sendMessage(text);
+    }
+
+    function sendMessage(text) {
+      hideWelcome();
+      var chatArea = document.getElementById('chatArea');
+
+      // User bubble
+      var userMsg = document.createElement('div');
+      userMsg.className = 'chat-msg user';
+      userMsg.innerHTML = '<div class="msg-avatar human">J</div><div class="msg-bubble">' + escapeHtml(text) + '</div>';
+      chatArea.appendChild(userMsg);
+      scrollToBottom();
+
+      // Typing indicator
+      var typingEl = document.createElement('div');
+      typingEl.className = 'chat-msg ai';
+      typingEl.innerHTML = '<div class="msg-avatar ai"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg></div><div class="msg-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+      chatArea.appendChild(typingEl);
+      scrollToBottom();
+
+      // AI response after delay
+      setTimeout(function() {
+        chatArea.removeChild(typingEl);
+
+        var response = cannedResponses[text] || fallbackResponse;
+        var aiMsg = document.createElement('div');
+        aiMsg.className = 'chat-msg ai';
+
+        var bubbleHTML = '<div class="msg-avatar ai"><svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg></div>';
+        bubbleHTML += '<div class="msg-bubble">';
+        bubbleHTML += '<div>' + response.text.replace(/\n/g, '<br>') + '</div>';
+
+        // Specialist recommendation for symptom type
+        if (response.specialist) {
+          bubbleHTML += '<div class="msg-specialist"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>Recommended: ' + response.specialist + '</div>';
+          bubbleHTML += '<button class="find-doctor-btn" onclick="showToast(\'Coming soon!\')"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Find Doctor</button>';
+        }
+
+        // Disclaimer
+        bubbleHTML += '<div class="msg-disclaimer"><svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></svg>Consult your doctor for personalized advice</div>';
+
+        // Follow-up prompts
+        if (response.followups && response.followups.length) {
+          bubbleHTML += '<div class="followup-prompts">';
+          for (var i = 0; i < response.followups.length; i++) {
+            bubbleHTML += '<button class="followup-prompt" onclick="sendMessage(\'' + response.followups[i].replace(/'/g, "\\'") + '\')">' + response.followups[i] + '</button>';
+          }
+          bubbleHTML += '</div>';
+        }
+
+        bubbleHTML += '</div>';
+        aiMsg.innerHTML = bubbleHTML;
+        chatArea.appendChild(aiMsg);
+        scrollToBottom();
+      }, 1500);
+    }
+
+    function scrollToBottom() {
+      var chatArea = document.getElementById('chatArea');
+      setTimeout(function() {
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }, 50);
+    }
+
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showToast(msg) {
+      var toast = document.getElementById('aiToast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2000);
+    }
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

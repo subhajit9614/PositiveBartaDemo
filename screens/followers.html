@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Followers</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .follower-tabs {
+      display: flex; border-bottom: 1px solid var(--border-color);
+    }
+    .follower-tab {
+      flex: 1; padding: var(--space-md); text-align: center;
+      font-size: var(--font-md); font-weight: 600; color: var(--text-muted);
+      cursor: pointer; border: none; background: none; font-family: var(--font-family); position: relative;
+    }
+    .follower-tab.active { color: var(--text-primary); }
+    .follower-tab.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--accent-primary);
+    }
+    .follower-search {
+      padding: var(--space-md) var(--space-lg); position: relative;
+    }
+    .follower-search input {
+      width: 100%; padding: 10px 14px 10px 40px;
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      border-radius: var(--radius-full); color: var(--text-primary);
+      font-size: var(--font-sm); font-family: var(--font-family); outline: none;
+    }
+    .follower-search input::placeholder { color: var(--text-muted); }
+    .follower-search svg { position: absolute; left: 28px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; fill: var(--text-muted); }
+    .follower-item {
+      display: flex; align-items: center; gap: var(--space-md);
+      padding: var(--space-sm) var(--space-lg); cursor: pointer;
+    }
+    .follower-item:hover { background: var(--hover-overlay); }
+    .follower-item .avatar { width: 48px; height: 48px; font-size: 16px; }
+    .follower-info { flex: 1; min-width: 0; }
+    .follower-username { font-size: var(--font-md); font-weight: 600; color: var(--text-primary); }
+    .follower-name { font-size: var(--font-sm); color: var(--text-muted); }
+    .follow-btn {
+      padding: 8px 20px; border-radius: var(--radius-sm); font-size: var(--font-sm);
+      font-weight: 600; cursor: pointer; font-family: var(--font-family); transition: all 0.2s;
+    }
+    .follow-btn.follow { background: var(--accent-primary); border: none; color: white; }
+    .follow-btn.following { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+    .follow-btn.follow-back { background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary); }
+    .mutual-badge { font-size: var(--font-xs); color: var(--text-muted); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+    .mutual-badge svg { width: 12px; height: 12px; fill: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+    <div class="top-bar">
+      <a href="profile.html" class="back-btn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+      <span class="top-bar-title">dr_jayesh</span>
+      <div style="width: 36px;"></div>
+    </div>
+    <div class="follower-tabs">
+      <button class="follower-tab active" onclick="switchTab(this)">14.2K Followers</button>
+      <button class="follower-tab" onclick="switchTab(this)">892 Following</button>
+    </div>
+    <div class="follower-search">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="text" placeholder="Search">
+    </div>
+    <div class="screen-content">
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">S</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_sneha</div>
+          <div class="follower-name">Dr. Sneha Sharma</div>
+          <div class="mutual-badge"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> Followed by dr_mohit + 3 more</div>
+        </div>
+        <button class="follow-btn following">Following</button>
+      </div>
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">M</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_mohit</div>
+          <div class="follower-name">Dr. Mohit Verma</div>
+        </div>
+        <button class="follow-btn following">Following</button>
+      </div>
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">A</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_arjun</div>
+          <div class="follower-name">Dr. Arjun Reddy</div>
+          <div class="mutual-badge"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> Followed by dr_sneha</div>
+        </div>
+        <button class="follow-btn follow-back">Follow back</button>
+      </div>
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">L</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_lakshmi</div>
+          <div class="follower-name">Dr. Lakshmi Iyer</div>
+        </div>
+        <button class="follow-btn following">Following</button>
+      </div>
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #ffecd2, #fcb69f); color: #333;">R</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_rajesh</div>
+          <div class="follower-name">Dr. Rajesh Patel</div>
+        </div>
+        <button class="follow-btn follow">Follow</button>
+      </div>
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #ff9a9e, #fad0c4); color: #333;">K</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_kavita</div>
+          <div class="follower-name">Dr. Kavita Singh</div>
+        </div>
+        <button class="follow-btn following">Following</button>
+      </div>
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #d4fc79, #96e6a1); color: #333;">N</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_nikhil</div>
+          <div class="follower-name">Dr. Nikhil Gupta</div>
+        </div>
+        <button class="follow-btn follow">Follow</button>
+      </div>
+      <div class="follower-item">
+        <div class="avatar" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb); color: #333;">E</div>
+        <div class="follower-info">
+          <div class="follower-username">dr_esha</div>
+          <div class="follower-name">Dr. Esha Kapoor</div>
+          <div class="mutual-badge"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> Followed by dr_lakshmi + 5 more</div>
+        </div>
+        <button class="follow-btn follow-back">Follow back</button>
+      </div>
+      <div style="height: var(--space-xl);"></div>
+    </div>
+  </div>
+  <script>
+    function switchTab(el) {
+      document.querySelectorAll('.follower-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+    document.querySelectorAll('.follow-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (btn.classList.contains('follow') || btn.classList.contains('follow-back')) {
+          btn.className = 'follow-btn following';
+          btn.textContent = 'Following';
+        } else {
+          btn.className = 'follow-btn follow';
+          btn.textContent = 'Follow';
+        }
+      });
+    });
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

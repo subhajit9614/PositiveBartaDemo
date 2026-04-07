@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Welcome</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .splash-screen {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .splash-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(233, 69, 96, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(83, 52, 131, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(233, 69, 96, 0.05) 0%, transparent 70%);
+    }
+
+    .splash-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      padding: 0 var(--space-2xl);
+    }
+
+    .logo-container {
+      margin-bottom: var(--space-xl);
+      animation: logoFadeIn 1s ease-out;
+    }
+
+    .logo-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--accent-gradient);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(233, 69, 96, 0.3);
+    }
+
+    .logo-icon svg { width: 44px; height: 44px; fill: white; }
+
+    .app-name {
+      font-size: 32px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: var(--space-lg);
+      animation: logoFadeIn 1s ease-out 0.2s both;
+    }
+
+    .app-tagline {
+      color: var(--text-secondary);
+      font-size: var(--font-md);
+      margin-top: var(--space-sm);
+      animation: logoFadeIn 1s ease-out 0.4s both;
+    }
+
+    /* Onboarding Slides */
+    .onboarding-slides {
+      margin-top: var(--space-3xl);
+      text-align: center;
+      animation: logoFadeIn 1s ease-out 0.6s both;
+    }
+
+    .slide {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .slide.active { display: flex; }
+
+    .slide-illustration {
+      width: 200px;
+      height: 150px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .slide-illustration svg { width: 64px; height: 64px; fill: var(--accent-primary); opacity: 0.8; }
+
+    .slide-title {
+      font-size: var(--font-xl);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .slide-desc {
+      font-size: var(--font-md);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 280px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: var(--space-xl);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-color);
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .dot.active {
+      width: 24px;
+      border-radius: 4px;
+      background: var(--accent-primary);
+    }
+
+    .splash-actions {
+      padding: var(--space-xl) var(--space-2xl);
+      padding-bottom: var(--space-3xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.8s ease-out 0.8s both;
+    }
+
+    .splash-actions .btn { border-radius: var(--radius-lg); padding: 16px; }
+
+    @keyframes logoFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="splash-screen">
+      <div class="splash-bg"></div>
+      
+      <div class="splash-content">
+        <div class="logo-container">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        <div class="app-name">Itibachok Barta</div>
+        <div class="app-tagline">Stories that inspire</div>
+
+        <div class="onboarding-slides">
+          <div class="slide active" id="slide-1">
+            <div class="slide-illustration">
+              <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
+            </div>
+            <div class="slide-title">Discover Reels</div>
+            <div class="slide-desc">Watch short videos that entertain, educate, and inspire you every day</div>
+          </div>
+
+          <div class="slide" id="slide-2">
+            <div class="slide-illustration">
+              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
+            <div class="slide-title">Join the Community</div>
+            <div class="slide-desc">Connect with creators and share moments that matter</div>
+          </div>
+
+          <div class="slide" id="slide-3">
+            <div class="slide-illustration">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            </div>
+            <div class="slide-title">Stay Updated</div>
+            <div class="slide-desc">Get the latest news and events, all in one place</div>
+          </div>
+
+          <div class="dots">
+            <button class="dot active" onclick="showSlide(0)"></button>
+            <button class="dot" onclick="showSlide(1)"></button>
+            <button class="dot" onclick="showSlide(2)"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="splash-actions">
+        <a href="login.html" class="btn btn-primary btn-full">Get Started</a>
+        <a href="login.html" class="btn btn-ghost btn-full" style="color: var(--text-secondary);">I already have an account</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/theme.js"></script>
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+
+    function showSlide(index) {
+      slides.forEach(s => s.classList.remove('active'));
+      dots.forEach(d => d.classList.remove('active'));
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+      currentSlide = index;
+    }
+
+    // Auto-advance slides
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 4000);
+  </script>
+</body>
+</html>

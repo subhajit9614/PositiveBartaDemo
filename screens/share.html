@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Share Reel</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .phone-frame { background: var(--bg-primary); }
+
+    .share-backdrop {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px); z-index: 1;
+    }
+
+    .share-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--bg-primary);
+      border-radius: 20px 20px 0 0;
+      z-index: 10;
+      padding-bottom: 90px;
+      max-height: 75%;
+      overflow-y: auto;
+    }
+
+    .share-sheet-handle {
+      width: 36px; height: 4px; background: var(--text-muted); border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    .share-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .share-title {
+      font-size: var(--font-lg); font-weight: 700; color: var(--text-primary);
+    }
+
+    .share-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--bg-input); border: none;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+
+    .share-close svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+
+    /* Search bar */
+    .share-search {
+      padding: 0 var(--space-lg) var(--space-md);
+    }
+
+    .share-search-wrap {
+      position: relative;
+    }
+
+    .share-search-wrap svg {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; fill: var(--text-muted);
+    }
+
+    .share-search input {
+      width: 100%; padding: 10px 14px 10px 36px;
+      background: var(--bg-input); border: 1px solid var(--border-color);
+      border-radius: var(--radius-full); color: var(--text-primary);
+      font-size: var(--font-sm); font-family: var(--font-family); outline: none;
+    }
+
+    .share-search input::placeholder { color: var(--text-muted); }
+
+    /* Section label */
+    .share-section-label {
+      font-size: var(--font-xs); font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: var(--space-sm) var(--space-lg);
+    }
+
+    /* In-app users horizontal scroll */
+    .share-users-row {
+      display: flex; gap: 16px; padding: var(--space-sm) var(--space-lg);
+      overflow-x: auto; scrollbar-width: none;
+    }
+
+    .share-users-row::-webkit-scrollbar { display: none; }
+
+    .share-user-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; min-width: 64px; cursor: pointer;
+    }
+
+    .share-user-item .avatar {
+      width: 48px; height: 48px; font-size: 16px;
+    }
+
+    .share-user-name {
+      font-size: 10px; color: var(--text-secondary);
+      max-width: 64px; text-align: center;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .share-send-btn {
+      background: var(--accent-primary); border: none;
+      color: white; font-size: 10px; font-weight: 700;
+      font-family: var(--font-family);
+      padding: 4px 12px; border-radius: var(--radius-full);
+      cursor: pointer; transition: all 0.2s;
+    }
+
+    .share-send-btn.sent {
+      background: var(--success, #22c55e);
+    }
+
+    /* Divider */
+    .share-divider {
+      height: 1px; background: var(--border-color);
+      margin: var(--space-md) var(--space-lg);
+    }
+
+    /* External share row */
+    .share-external-row {
+      display: flex; gap: 16px; padding: var(--space-sm) var(--space-lg);
+      overflow-x: auto; scrollbar-width: none;
+    }
+
+    .share-external-row::-webkit-scrollbar { display: none; }
+
+    .share-ext-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; min-width: 64px; cursor: pointer;
+    }
+
+    .share-ext-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .share-ext-icon svg { width: 24px; height: 24px; }
+
+    .share-ext-icon.whatsapp { background: #25D366; }
+    .share-ext-icon.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .share-ext-icon.twitter { background: #000; }
+    .share-ext-icon.facebook { background: #1877F2; }
+    .share-ext-icon.copy-link { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    .share-ext-icon.copy-link svg { fill: var(--text-primary); }
+    .share-ext-icon.more { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    .share-ext-icon.more svg { fill: var(--text-primary); }
+
+    .share-ext-label {
+      font-size: 10px; color: var(--text-secondary);
+      text-align: center; white-space: nowrap;
+    }
+
+    /* Toast */
+    .share-toast {
+      position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: var(--success, #22c55e); color: white;
+      padding: 10px 24px; border-radius: var(--radius-full);
+      font-size: var(--font-sm); font-weight: 600;
+      z-index: 200; opacity: 0; transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .share-toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z" fill="white"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" fill="white"/></svg>
+      </span>
+    </div>
+
+    <div class="share-backdrop"></div>
+
+    <div class="share-sheet">
+      <div class="share-sheet-handle"></div>
+      <div class="share-header">
+        <div class="share-title">Share</div>
+        <button class="share-close" onclick="window.location.href='home.html'">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </div>
+      <div class="share-search">
+        <div class="share-search-wrap">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" placeholder="Search people...">
+        </div>
+      </div>
+      <div class="share-section-label">Send to</div>
+      <div class="share-users-row">
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_mohit">M</div>
+          <div class="share-user-name">@dr_mohit</div>
+          <button class="share-send-btn" onclick="sendShare(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_arjun">A</div>
+          <div class="share-user-name">@dr_arjun</div>
+          <button class="share-send-btn" onclick="sendShare(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_priya">P</div>
+          <div class="share-user-name">@dr_priya</div>
+          <button class="share-send-btn" onclick="sendShare(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_lakshmi">L</div>
+          <div class="share-user-name">@dr_lakshmi</div>
+          <button class="share-send-btn" onclick="sendShare(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_rajesh">R</div>
+          <div class="share-user-name">@dr_rajesh</div>
+          <button class="share-send-btn" onclick="sendShare(this)">Send</button>
+        </div>
+        <div class="share-user-item">
+          <div class="avatar" data-username="dr_kavita">K</div>
+          <div class="share-user-name">@dr_kavita</div>
+          <button class="share-send-btn" onclick="sendShare(this)">Send</button>
+        </div>
+      </div>
+      <div class="share-divider"></div>
+      <div class="share-section-label">Share to</div>
+      <div class="share-external-row">
+        <div class="share-ext-item">
+          <div class="share-ext-icon whatsapp">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </div>
+          <div class="share-ext-label">WhatsApp</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon instagram">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </div>
+          <div class="share-ext-label">Instagram</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon twitter">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <div class="share-ext-label">X</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon facebook">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </div>
+          <div class="share-ext-label">Facebook</div>
+        </div>
+        <div class="share-ext-item" onclick="copyLink(this)">
+          <div class="share-ext-icon copy-link">
+            <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+          </div>
+          <div class="share-ext-label">Copy Link</div>
+        </div>
+        <div class="share-ext-item">
+          <div class="share-ext-icon more">
+            <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </div>
+          <div class="share-ext-label">More</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="share-toast" id="shareToast">Sent!</div>
+  </div>
+
+  <script>
+    // Avatar colors
+    var avatarGradients = [
+      'linear-gradient(135deg, #667eea, #764ba2)',
+      'linear-gradient(135deg, #f093fb, #f5576c)',
+      'linear-gradient(135deg, #4facfe, #00f2fe)',
+      'linear-gradient(135deg, #f5af19, #f12711)',
+      'linear-gradient(135deg, #11998e, #38ef7d)',
+      'linear-gradient(135deg, #fc5c7d, #6a82fb)',
+      'linear-gradient(135deg, #f7971e, #ffd200)',
+      'linear-gradient(135deg, #00c6ff, #0072ff)'
+    ];
+
+    function getAvatarColor(username) {
+      var hash = 0;
+      for (var i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return avatarGradients[Math.abs(hash) % avatarGradients.length];
+    }
+
+    document.querySelectorAll('.avatar[data-username]').forEach(function(el) {
+      el.style.background = getAvatarColor(el.dataset.username);
+    });
+
+    function sendShare(btn) {
+      btn.classList.add('sent');
+      btn.textContent = 'Sent!';
+      var toast = document.getElementById('shareToast');
+      var name = btn.closest('.share-user-item').querySelector('.share-user-name').textContent;
+      toast.textContent = 'Reel sent to ' + name;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2000);
+    }
+
+    function copyLink(item) {
+      var label = item.querySelector('.share-ext-label');
+      label.textContent = 'Copied!';
+      setTimeout(function() { label.textContent = 'Copy Link'; }, 2000);
+    }
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

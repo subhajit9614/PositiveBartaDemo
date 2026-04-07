@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Post Reel</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .post-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      flex-shrink: 0;
+    }
+
+    .post-top-bar .back-btn svg { width: 22px; height: 22px; fill: var(--text-primary); }
+
+    .post-top-title {
+      font-size: var(--font-lg);
+      font-weight: 700;
+    }
+
+    .post-publish-btn {
+      padding: 8px 20px;
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--font-sm);
+      font-weight: 700;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .post-publish-btn:hover { background: #d63a52; }
+
+    /* Video + Caption row */
+    .video-caption-row {
+      display: flex;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+    }
+
+    .video-thumb {
+      width: 80px;
+      height: 120px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #0a0a1a, #1a0a1a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .video-thumb svg { width: 28px; height: 28px; fill: rgba(255,255,255,0.2); }
+
+    .video-thumb-duration {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      padding: 2px 6px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 4px;
+      font-size: 10px;
+      color: white;
+      font-weight: 600;
+    }
+
+    .caption-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .caption-side-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
+    .caption-input {
+      width: 100%;
+      flex: 1;
+      padding: var(--space-sm);
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: var(--font-sm);
+      font-family: var(--font-family);
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.4;
+    }
+
+    .caption-input::placeholder { color: var(--text-muted); }
+    .caption-input:focus { border-color: var(--accent-primary); }
+
+    .caption-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .ai-rewrite-btn {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: none;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: var(--radius-full);
+      color: #8b5cf6;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ai-rewrite-btn.show { display: inline-flex; }
+    .ai-rewrite-btn:hover { background: rgba(139, 92, 246, 0.1); }
+
+    .ai-rewrite-btn svg {
+      width: 12px;
+      height: 12px;
+      fill: #8b5cf6;
+    }
+
+    .char-count {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+    }
+
+    /* Section divider */
+    .post-divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 0 var(--space-lg);
+    }
+
+    /* Post sections (hashtags, events) */
+    .post-section {
+      padding: var(--space-lg);
+    }
+
+    .post-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .post-section-label {
+      font-size: var(--font-md);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .ai-generate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      background: var(--accent-subtle);
+      border: 1px solid rgba(233, 69, 96, 0.2);
+      border-radius: var(--radius-full);
+      color: var(--accent-primary);
+      font-size: var(--font-xs);
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ai-generate-btn:hover {
+      background: rgba(233, 69, 96, 0.15);
+    }
+
+    .ai-generate-btn svg { width: 14px; height: 14px; fill: var(--accent-primary); }
+
+    /* Hashtags */
+    .hashtag-input-row {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .hashtag-input {
+      flex: 1;
+      padding: 10px var(--space-md);
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: var(--font-sm);
+      font-family: var(--font-family);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .hashtag-input::placeholder { color: var(--text-muted); }
+    .hashtag-input:focus { border-color: var(--accent-primary); }
+
+    .hashtag-add-btn {
+      padding: 10px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: var(--font-sm);
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .hashtag-add-btn:hover { background: var(--bg-surface-light); }
+
+    .hashtag-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .hashtag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      font-size: var(--font-xs);
+      color: var(--text-link);
+      font-weight: 500;
+      cursor: default;
+    }
+
+    .hashtag-chip .remove-tag {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .hashtag-chip .remove-tag svg { width: 8px; height: 8px; fill: var(--bg-primary); }
+
+    /* Events list */
+    .event-search-wrap {
+      position: relative;
+      margin-bottom: var(--space-md);
+    }
+
+    .event-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .event-search-input {
+      width: 100%;
+      padding: 10px 12px 10px 38px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: var(--font-sm);
+      font-family: var(--font-family);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .event-search-input::placeholder { color: var(--text-muted); }
+    .event-search-input:focus { border-color: var(--accent-primary); }
+
+    .event-no-results {
+      text-align: center;
+      padding: var(--space-xl) 0;
+      font-size: var(--font-sm);
+      color: var(--text-muted);
+    }
+
+    .event-linked {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    .event-linked-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .event-linked-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--accent-primary);
+    }
+
+    .event-linked-name {
+      flex: 1;
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-pick-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) 0;
+      cursor: pointer;
+    }
+
+    .event-pick-item + .event-pick-item {
+      border-top: 1px solid var(--border-color);
+    }
+
+    .event-pick-date {
+      width: 44px;
+      height: 48px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid var(--border-color);
+    }
+
+    .event-pick-date .month {
+      font-size: 10px;
+      color: var(--accent-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .event-pick-date .day {
+      font-size: var(--font-lg);
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .event-pick-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .event-pick-title {
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-pick-location {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .event-pick-check {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .event-pick-check.selected {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .event-pick-check svg {
+      width: 14px;
+      height: 14px;
+      fill: white;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .event-pick-check.selected svg { opacity: 1; }
+
+    /* AI generating state */
+    .ai-generating {
+      display: none;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: var(--accent-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .ai-generating.active { display: flex; }
+
+    .ai-generating .mini-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(233, 69, 96, 0.2);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ai-generating span {
+      font-size: var(--font-xs);
+      color: var(--accent-primary);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <!-- Top bar -->
+    <div class="post-top-bar">
+      <button class="back-btn" onclick="window.location.href='create.html'">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <span class="post-top-title">New Reel</span>
+      <button class="post-publish-btn" onclick="window.location.href='review-pending.html'">Publish</button>
+    </div>
+
+    <div class="screen-content">
+      <!-- Video + Caption side by side -->
+      <div class="video-caption-row">
+        <div class="video-thumb">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <span class="video-thumb-duration">0:28</span>
+        </div>
+        <div class="caption-side">
+          <div class="caption-side-header">
+            <span class="post-section-label">Caption</span>
+            <button class="ai-generate-btn" onclick="aiGenerateCaption()">
+              <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+              AI Generate
+            </button>
+          </div>
+          <div class="ai-generating" id="captionAiLoader">
+            <div class="mini-spinner"></div>
+            <span>AI is writing your caption...</span>
+          </div>
+          <textarea class="caption-input" id="captionInput" placeholder="Write a caption..." maxlength="300"></textarea>
+          <div class="caption-footer">
+            <button class="ai-rewrite-btn" id="rewriteBtn" onclick="aiRewriteCaption()">
+              <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+              Rewrite
+            </button>
+            <span class="char-count"><span id="charCount">0</span>/300</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="post-divider"></div>
+
+      <!-- Hashtags -->
+      <div class="post-section">
+        <div class="post-section-header">
+          <span class="post-section-label">Hashtags</span>
+          <button class="ai-generate-btn" onclick="aiGenerateHashtags()">
+            <svg viewBox="0 0 24 24"><path d="M9.5 2l1.5 3.5L14.5 7l-3.5 1.5L9.5 12 8 8.5 4.5 7 8 5.5 9.5 2zm7 5l1 2.5L20 11l-2.5 1-1 2.5-1-2.5L13 11l2.5-1 1-2.5zM6 14l1.5 3.5L11 19l-3.5 1.5L6 24l-1.5-3.5L1 19l3.5-1.5L6 14z"/></svg>
+            AI Generate
+          </button>
+        </div>
+        <div class="ai-generating" id="hashtagAiLoader">
+          <div class="mini-spinner"></div>
+          <span>AI is suggesting hashtags...</span>
+        </div>
+        <div class="hashtag-input-row">
+          <input class="hashtag-input" id="hashtagInput" type="text" placeholder="Add a hashtag...">
+          <button class="hashtag-add-btn" onclick="addHashtag()">Add</button>
+        </div>
+        <div class="hashtag-chips" id="hashtagChips">
+          <div class="hashtag-chip">
+            #medicalreels
+            <span class="remove-tag" onclick="this.parentElement.remove()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span>
+          </div>
+          <div class="hashtag-chip">
+            #itibachok
+            <span class="remove-tag" onclick="this.parentElement.remove()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span>
+          </div>
+          <div class="hashtag-chip">
+            #healthawareness
+            <span class="remove-tag" onclick="this.parentElement.remove()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="post-divider"></div>
+
+      <!-- Join an Event -->
+      <div class="post-section">
+        <div class="post-section-header">
+          <span class="post-section-label" id="eventSectionLabel">Join an Event</span>
+        </div>
+
+        <!-- Linked event (shown when coming from event detail) -->
+        <div id="eventLinked" style="display:none;">
+          <div class="event-linked">
+            <div class="event-linked-icon">
+              <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            </div>
+            <span class="event-linked-name" id="eventLinkedName"></span>
+          </div>
+        </div>
+
+        <!-- Normal event picker (hidden when linked) -->
+        <div id="eventPicker">
+        <div class="event-search-wrap">
+          <svg class="event-search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input class="event-search-input" id="eventSearch" type="text" placeholder="Search events..." oninput="filterEvents()">
+        </div>
+
+        <div id="eventList">
+
+        <div class="event-pick-item" onclick="toggleEventPick(this)">
+          <div class="event-pick-date">
+            <span class="month">Apr</span>
+            <span class="day">15</span>
+          </div>
+          <div class="event-pick-info">
+            <div class="event-pick-title">National Medical Reels Summit 2026</div>
+            <div class="event-pick-location">AIIMS, New Delhi</div>
+          </div>
+          <div class="event-pick-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+        </div>
+
+        <div class="event-pick-item" onclick="toggleEventPick(this)">
+          <div class="event-pick-date">
+            <span class="month">Apr</span>
+            <span class="day">22</span>
+          </div>
+          <div class="event-pick-info">
+            <div class="event-pick-title">Healthcare Heroes Awards Night</div>
+            <div class="event-pick-location">Virtual Event</div>
+          </div>
+          <div class="event-pick-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+        </div>
+
+        <div class="event-pick-item" onclick="toggleEventPick(this)">
+          <div class="event-pick-date">
+            <span class="month">Apr</span>
+            <span class="day">10</span>
+          </div>
+          <div class="event-pick-info">
+            <div class="event-pick-title">Free Health Checkup Camp</div>
+            <div class="event-pick-location">Apollo Hospital, Chennai</div>
+          </div>
+          <div class="event-pick-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+        </div>
+
+        <div class="event-pick-item" onclick="toggleEventPick(this)">
+          <div class="event-pick-date">
+            <span class="month">Apr</span>
+            <span class="day">18</span>
+          </div>
+          <div class="event-pick-info">
+            <div class="event-pick-title">Blood Donation Drive</div>
+            <div class="event-pick-location">Fortis Hospital, Mumbai</div>
+          </div>
+          <div class="event-pick-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+        </div>
+        </div>
+
+        <div class="event-no-results" id="eventNoResults" style="display:none;">No events found</div>
+        </div><!-- end #eventPicker -->
+      </div>
+
+      <div style="height: 24px;"></div>
+    </div>
+  </div>
+
+  <script src="../js/theme.js"></script>
+  <script>
+    // Event deep-link: if coming from event detail, show linked event instead of picker
+    (function() {
+      var eventName = localStorage.getItem('eventReel');
+      if (eventName) {
+        localStorage.removeItem('eventReel');
+        document.getElementById('eventSectionLabel').textContent = 'Event';
+        document.getElementById('eventLinkedName').textContent = eventName;
+        document.getElementById('eventLinked').style.display = '';
+        document.getElementById('eventPicker').style.display = 'none';
+      }
+    })();
+
+    // Character count + show/hide rewrite button
+    var captionInput = document.getElementById('captionInput');
+    var charCount = document.getElementById('charCount');
+    var rewriteBtn = document.getElementById('rewriteBtn');
+    captionInput.addEventListener('input', function() {
+      charCount.textContent = captionInput.value.length;
+      if (captionInput.value.trim().length > 0) {
+        rewriteBtn.classList.add('show');
+      } else {
+        rewriteBtn.classList.remove('show');
+      }
+    });
+
+    // Add hashtag
+    function addHashtag() {
+      var input = document.getElementById('hashtagInput');
+      var val = input.value.trim().replace(/^#/, '');
+      if (!val) return;
+      var chip = document.createElement('div');
+      chip.className = 'hashtag-chip';
+      chip.innerHTML = '#' + val + ' <span class="remove-tag" onclick="this.parentElement.remove()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span>';
+      document.getElementById('hashtagChips').appendChild(chip);
+      input.value = '';
+    }
+
+    // Enter key to add hashtag
+    document.getElementById('hashtagInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); addHashtag(); }
+    });
+
+    // Toggle event selection
+    function toggleEventPick(item) {
+      var check = item.querySelector('.event-pick-check');
+      check.classList.toggle('selected');
+    }
+
+    // Filter events by search
+    function filterEvents() {
+      var query = document.getElementById('eventSearch').value.toLowerCase();
+      var items = document.querySelectorAll('.event-pick-item');
+      var visible = 0;
+      items.forEach(function(item) {
+        var title = item.querySelector('.event-pick-title').textContent.toLowerCase();
+        var location = item.querySelector('.event-pick-location').textContent.toLowerCase();
+        var match = title.indexOf(query) !== -1 || location.indexOf(query) !== -1;
+        item.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      document.getElementById('eventNoResults').style.display = visible === 0 ? '' : 'none';
+    }
+
+    // AI generate caption
+    function aiGenerateCaption() {
+      var loader = document.getElementById('captionAiLoader');
+      loader.classList.add('active');
+      setTimeout(function() {
+        loader.classList.remove('active');
+        captionInput.value = 'Spreading health awareness one reel at a time! Early detection saves lives — let\u2019s make healthcare knowledge accessible to all.';
+        charCount.textContent = captionInput.value.length;
+        rewriteBtn.classList.add('show');
+      }, 1500);
+    }
+
+    // AI rewrite caption
+    var rewriteVariants = [
+      'Every small step towards health matters. Let\'s inspire each other to live better, one reel at a time!',
+      'Your wellness journey starts here. Together we can make healthcare accessible and uplifting for everyone.',
+      'Health is wealth, and sharing knowledge is caring. Join us in spreading awareness that truly makes a difference!'
+    ];
+    var rewriteIndex = 0;
+
+    function aiRewriteCaption() {
+      var loader = document.getElementById('captionAiLoader');
+      loader.querySelector('span').textContent = 'AI is rewriting...';
+      loader.classList.add('active');
+      rewriteBtn.classList.remove('show');
+      setTimeout(function() {
+        loader.classList.remove('active');
+        loader.querySelector('span').textContent = 'AI is writing your caption...';
+        captionInput.value = rewriteVariants[rewriteIndex % rewriteVariants.length];
+        rewriteIndex++;
+        charCount.textContent = captionInput.value.length;
+        rewriteBtn.classList.add('show');
+      }, 1500);
+    }
+
+    // AI generate hashtags
+    function aiGenerateHashtags() {
+      var loader = document.getElementById('hashtagAiLoader');
+      loader.classList.add('active');
+      setTimeout(function() {
+        loader.classList.remove('active');
+        var tags = ['healthcare', 'medicalreels', 'healthawareness', 'doctorsofitibachok', 'wellness'];
+        var container = document.getElementById('hashtagChips');
+        tags.forEach(function(tag) {
+          var chip = document.createElement('div');
+          chip.className = 'hashtag-chip';
+          chip.innerHTML = '#' + tag + ' <span class="remove-tag" onclick="this.parentElement.remove()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span>';
+          container.appendChild(chip);
+        });
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

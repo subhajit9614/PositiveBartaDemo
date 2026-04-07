@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Notifications</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .notif-tabs {
+      display: flex; padding: 0 var(--space-lg); gap: var(--space-sm);
+      margin-bottom: var(--space-md); overflow-x: auto; scrollbar-width: none;
+    }
+    .notif-tabs::-webkit-scrollbar { display: none; }
+    .notif-tab {
+      padding: 8px 16px; border-radius: var(--radius-full);
+      background: var(--bg-surface); border: 1px solid var(--border-color);
+      font-size: var(--font-sm); font-weight: 600; color: var(--text-secondary);
+      cursor: pointer; white-space: nowrap; font-family: var(--font-family);
+      transition: all 0.2s;
+    }
+    .notif-tab.active { background: var(--accent-primary); border-color: var(--accent-primary); color: white; }
+    .time-group { padding: var(--space-sm) var(--space-lg); font-size: var(--font-sm); font-weight: 700; color: var(--text-muted); }
+    .notif-item {
+      display: flex; align-items: center; gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg); cursor: pointer; transition: background 0.2s;
+    }
+    .notif-item:hover { background: var(--hover-overlay); }
+    .notif-item.unread { background: var(--accent-subtle); }
+    .notif-avatar { position: relative; flex-shrink: 0; }
+    .notif-avatar .avatar { width: 44px; height: 44px; }
+    .notif-type-icon {
+      position: absolute; bottom: -2px; right: -2px;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--bg-primary);
+    }
+    .notif-type-icon svg { width: 10px; height: 10px; fill: white; }
+    .notif-type-icon.like { background: var(--accent-primary); }
+    .notif-type-icon.comment { background: #4facfe; }
+    .notif-type-icon.follow { background: var(--accent-secondary); }
+    .notif-type-icon.mention { background: var(--success); }
+    .notif-type-icon.share { background: #f59e0b; }
+    .notif-content { flex: 1; min-width: 0; }
+    .notif-text { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.4; }
+    .notif-text strong { color: var(--text-primary); font-weight: 600; }
+    .notif-time { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+    .notif-thumb {
+      width: 44px; height: 56px; border-radius: var(--radius-sm);
+      background: var(--bg-surface); flex-shrink: 0; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .notif-thumb svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.15); }
+    .follow-back-btn {
+      padding: 6px 16px; background: var(--accent-primary); border: none;
+      border-radius: var(--radius-sm); color: white; font-size: var(--font-xs);
+      font-weight: 600; cursor: pointer; white-space: nowrap; font-family: var(--font-family);
+    }
+    .follow-back-btn.following { background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+    <div class="top-bar">
+      <a href="home.html" class="back-btn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+      <span class="top-bar-title">Notifications</span>
+      <div style="width: 36px;"></div>
+    </div>
+    <div class="notif-tabs">
+      <button class="notif-tab active">All</button>
+      <button class="notif-tab">Likes</button>
+      <button class="notif-tab">Comments</button>
+      <button class="notif-tab">Follows</button>
+    </div>
+    <div class="screen-content">
+      <div class="time-group">Today</div>
+      <div class="notif-item unread">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2); width:44px; height:44px; font-size: 16px;">S</div><div class="notif-type-icon like"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_sneha</strong> liked your reel</div><div class="notif-time">2 min ago</div></div>
+        <div class="notif-thumb" style="background: linear-gradient(135deg, #1a2a3a, #2a1a3a);"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c); width:44px; height:44px; font-size: 16px;">M</div><div class="notif-type-icon comment"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_mohit</strong> commented: "Amazing breakdown of the laparoscopy procedure!"</div><div class="notif-time">15 min ago</div></div>
+        <div class="notif-thumb" style="background: linear-gradient(135deg, #2a3a1a, #3a1a2a);"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe); width:44px; height:44px; font-size: 16px;">A</div><div class="notif-type-icon follow"><svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_arjun</strong> started following you</div><div class="notif-time">1h ago</div></div>
+        <button class="follow-back-btn">Follow back</button>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb); width:44px; height:44px; font-size: 16px;">L</div><div class="notif-type-icon share"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_lakshmi</strong> shared a reel with you</div><div class="notif-time">2h ago</div></div>
+        <div class="notif-thumb" style="background: linear-gradient(135deg, #2a1a3a, #1a3a2a);"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="time-group">This Week</div>
+      <div class="notif-item">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb); width:44px; height:44px; font-size: 16px;">L</div><div class="notif-type-icon like"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_lakshmi</strong> and <strong>23 others</strong> liked your reel</div><div class="notif-time">2 days ago</div></div>
+        <div class="notif-thumb" style="background: linear-gradient(135deg, #3a2a1a, #1a3a2a);"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #ffecd2, #fcb69f); width:44px; height:44px; font-size: 16px; color: #333;">R</div><div class="notif-type-icon mention"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57V12c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57V12c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_rajesh</strong> mentioned you in a comment</div><div class="notif-time">3 days ago</div></div>
+        <div class="notif-thumb" style="background: linear-gradient(135deg, #1a1a3a, #3a1a1a);"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #ff9a9e, #fad0c4); width:44px; height:44px; font-size: 16px; color: #333;">K</div><div class="notif-type-icon follow"><svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_kavita</strong> started following you</div><div class="notif-time">5 days ago</div></div>
+        <button class="follow-back-btn following">Following</button>
+      </div>
+
+      <div class="time-group">Earlier</div>
+      <div class="notif-item">
+        <div class="notif-avatar"><div class="avatar" style="background: linear-gradient(135deg, #d4fc79, #96e6a1); width:44px; height:44px; font-size: 16px; color: #333;">N</div><div class="notif-type-icon comment"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/></svg></div></div>
+        <div class="notif-content"><div class="notif-text"><strong>@dr_nikhil</strong> replied to your comment</div><div class="notif-time">1 week ago</div></div>
+        <div class="notif-thumb" style="background: linear-gradient(135deg, #2a2a1a, #1a2a3a);"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <div style="height: var(--space-xl);"></div>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll('.notif-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

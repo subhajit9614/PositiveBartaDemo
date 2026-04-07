@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itibachok Barta - Create Reel</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .phone-frame { background: #000; }
+
+    .create-screen {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Camera viewfinder */
+    .camera-viewfinder {
+      flex: 1;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a0a1a 50%, #0a1a1a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .camera-placeholder {
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .camera-placeholder svg { width: 64px; height: 64px; fill: rgba(255,255,255,0.1); }
+    .camera-placeholder p { margin-top: var(--space-sm); font-size: var(--font-sm); color: rgba(255,255,255,0.2); }
+
+    /* Camera grid lines */
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .grid-lines::before,
+    .grid-lines::after {
+      content: '';
+      position: absolute;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .grid-lines::before {
+      top: 33.33%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      box-shadow: 0 calc(33.33vh) 0 rgba(255,255,255,0.05);
+    }
+
+    .grid-lines::after {
+      left: 33.33%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      box-shadow: calc(33.33vw) 0 0 rgba(255,255,255,0.05);
+    }
+
+    /* Top camera controls */
+    .camera-top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 60px var(--space-lg) var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .camera-close {
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.4);
+      border: none;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .camera-close svg { width: 22px; height: 22px; fill: white; }
+
+    .camera-top-right {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .camera-top-btn {
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.4);
+      border: none;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .camera-top-btn svg { width: 20px; height: 20px; fill: white; }
+
+    /* Left side tools */
+    .camera-left-tools {
+      position: absolute;
+      left: var(--space-lg);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+      z-index: 10;
+    }
+
+    .tool-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .tool-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.4);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .tool-icon svg { width: 20px; height: 20px; fill: white; }
+    .tool-label { font-size: 10px; color: rgba(255,255,255,0.7); }
+
+    /* Bottom controls */
+    .camera-bottom {
+      padding: var(--space-lg) var(--space-2xl);
+      padding-bottom: var(--space-3xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #000;
+    }
+
+    .gallery-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .gallery-btn svg { width: 22px; height: 22px; fill: var(--text-secondary); }
+
+    .record-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .record-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: transparent;
+      border: 4px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .record-btn-inner {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      transition: all 0.3s;
+    }
+
+    .record-btn:hover .record-btn-inner { background: #ff2d4f; }
+
+    .record-btn.recording .record-btn-inner {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--accent-primary);
+    }
+
+    .record-label {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+    }
+
+    .flip-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .flip-btn svg { width: 22px; height: 22px; fill: var(--text-secondary); }
+
+    /* Next button - appears after recording/upload */
+    .next-btn {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      right: var(--space-lg);
+      padding: 10px 28px;
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--font-md);
+      font-weight: 700;
+      font-family: var(--font-family);
+      cursor: pointer;
+      z-index: 20;
+      transition: background 0.2s;
+    }
+
+    .next-btn:hover { background: #d63a52; }
+    .next-btn.visible { display: block; }
+
+    /* Video ready state */
+    .camera-viewfinder.video-ready .camera-placeholder p { color: rgba(255,255,255,0.5); }
+    .camera-viewfinder.video-ready .camera-placeholder svg { fill: rgba(255,255,255,0.2); }
+
+    /* Processing overlay */
+    .processing-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-lg);
+    }
+
+    .processing-overlay.active { display: flex; }
+
+    .processing-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .processing-text {
+      color: white;
+      font-size: var(--font-md);
+      font-weight: 600;
+    }
+
+    .processing-subtext {
+      color: var(--text-muted);
+      font-size: var(--font-sm);
+    }
+
+    /* Event pill */
+    .event-pill {
+      display: none;
+      position: absolute;
+      top: 110px;
+      left: var(--space-lg);
+      z-index: 10;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-full);
+      max-width: calc(100% - 40px);
+    }
+
+    .event-pill.show { display: inline-flex; }
+
+    .event-pill svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--accent-primary);
+      flex-shrink: 0;
+    }
+
+    .event-pill span {
+      font-size: var(--font-xs);
+      font-weight: 600;
+      color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-pill .pill-close {
+      width: 16px;
+      height: 16px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .event-pill .pill-close svg {
+      width: 10px;
+      height: 10px;
+      fill: white;
+    }
+
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="gallery-link" title="All Screens">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+  </a>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="position: absolute; top: 0; left: 0; right: 0; z-index: 50;">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z" fill="white"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" fill="white"/></svg>
+      </span>
+    </div>
+
+    <div class="create-screen">
+      <!-- Processing Overlay -->
+      <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-spinner"></div>
+        <div class="processing-text">Processing video...</div>
+        <div class="processing-subtext">Optimizing for upload</div>
+      </div>
+
+      <!-- Camera Viewfinder -->
+      <div class="camera-viewfinder" id="viewfinder">
+        <div class="grid-lines"></div>
+
+        <!-- Event pill (shown when coming from event detail) -->
+        <div class="event-pill" id="eventPill">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          <span id="eventPillName"></span>
+          <button class="pill-close" onclick="dismissEventPill()">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
+
+        <div class="camera-placeholder">
+          <svg viewBox="0 0 24 24"><path d="M12 15.2l3.2-2.4L12 10.4V15.2zM20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/></svg>
+          <p>Camera Preview</p>
+        </div>
+
+        <!-- Top bar -->
+        <div class="camera-top-bar">
+          <button class="camera-close" onclick="window.location.href='home.html'">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+          <div class="camera-top-right">
+            <button class="camera-top-btn" title="Flash">
+              <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Left tools -->
+        <div class="camera-left-tools">
+          <div class="tool-item">
+            <div class="tool-icon">
+              <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+            </div>
+            <span class="tool-label">Filters</span>
+          </div>
+        </div>
+
+        <!-- Next button (appears after record/upload) -->
+        <button class="next-btn" id="nextBtn" onclick="startProcessing()">Next</button>
+      </div>
+
+      <!-- Bottom controls -->
+      <div class="camera-bottom">
+        <button class="gallery-btn" title="Gallery" onclick="onGalleryUpload()">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        </button>
+
+        <div class="record-btn-container">
+          <button class="record-btn" id="recordBtn" onclick="toggleRecord()">
+            <div class="record-btn-inner"></div>
+          </button>
+        </div>
+
+        <button class="flip-btn" title="Flip Camera">
+          <svg viewBox="0 0 24 24"><path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-5 11V9.5c0-.28-.22-.5-.5-.5H11v2.5L7.5 8 11 4.5V7h4c1.1 0 2 .9 2 2v7h-2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Event pill — show if coming from event detail
+    (function() {
+      var eventName = localStorage.getItem('eventReel');
+      if (eventName) {
+        document.getElementById('eventPillName').textContent = eventName;
+        document.getElementById('eventPill').classList.add('show');
+      }
+    })();
+
+    function dismissEventPill() {
+      document.getElementById('eventPill').classList.remove('show');
+      localStorage.removeItem('eventReel');
+    }
+
+    var isRecording = false;
+    var videoReady = false;
+
+    function toggleRecord() {
+      var btn = document.getElementById('recordBtn');
+      isRecording = !isRecording;
+      btn.classList.toggle('recording', isRecording);
+      // When recording stops, show Next button
+      if (!isRecording && btn.classList.length > 0) {
+        showVideoReady();
+      }
+    }
+
+    function onGalleryUpload() {
+      // Simulate picking a video from gallery
+      showVideoReady();
+    }
+
+    function showVideoReady() {
+      videoReady = true;
+      document.getElementById('viewfinder').classList.add('video-ready');
+      document.getElementById('nextBtn').classList.add('visible');
+      // Update placeholder text
+      var p = document.querySelector('.camera-placeholder p');
+      if (p) p.textContent = 'Video ready';
+    }
+
+    function startProcessing() {
+      document.getElementById('processingOverlay').classList.add('active');
+      // Simulate processing, then navigate
+      setTimeout(function() {
+        window.location.href = 'post-reel.html';
+      }, 2000);
+    }
+  </script>
+  <script src="../js/theme.js"></script>
+</body>
+</html>

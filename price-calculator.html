@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>KloudBeams — Infrastructure Pricing Estimator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:       #07090F;
+  --deep:      #0B0F1E;
+  --navy:      #101728;
+  --panel:     #141C2E;
+  --panel-2:   #1A2438;
+  --royal:     #1A3580;
+  --blue:      #2251CC;
+  --sky:       #3B82F6;
+  --gold:      #F0A500;
+  --gold-lt:   #F7C948;
+  --gold-dk:   #B87C00;
+  --white:     #FFFFFF;
+  --off:       #E8EDF8;
+  --dim:       #7A8BA8;
+  --dimmer:    #4A5870;
+  --green:     #34D399;
+  --orange:    #F97316;
+  --red:       #EF4444;
+  --border:    rgba(240,165,0,0.14);
+  --border-b:  rgba(59,130,246,0.18);
+  --border-soft: rgba(255,255,255,0.06);
+  --font-d:    'Cormorant Garamond', Georgia, serif;
+  --font-s:    'Jost', sans-serif;
+  --font-m:    'JetBrains Mono', monospace;
+  --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:var(--deep);
+  color:var(--white);
+  font-family:var(--font-s);
+  font-weight:300;
+  line-height:1.7;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+/* GRAIN */
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.018}
+
+/* AMBIENT GLOWS */
+.glow-bg{position:fixed;z-index:0;border-radius:50%;pointer-events:none;filter:blur(80px)}
+.gb1{top:-10%;right:-10%;width:600px;height:600px;
+  background:radial-gradient(circle,rgba(34,81,204,.18) 0%,transparent 70%);
+  animation:drift 18s ease-in-out infinite alternate}
+.gb2{bottom:-15%;left:-10%;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(240,165,0,.08) 0%,transparent 70%);
+  animation:drift 22s ease-in-out infinite alternate-reverse}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.1)}}
+
+/* HEADER */
+.page-wrap{position:relative;z-index:2;max-width:1320px;margin:0 auto;padding:60px 5% 100px}
+
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:32px;margin-bottom:48px;
+  border-bottom:1px solid var(--border-soft);
+  flex-wrap:wrap;gap:24px;
+  animation:fadeDown .9s var(--ease) both;
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+
+.logo{display:flex;align-items:center;gap:14px}
+.logo-mark{
+  width:44px;height:44px;position:relative;
+  border:1.5px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;
+  background:linear-gradient(135deg,rgba(240,165,0,.08),rgba(34,81,204,.04));
+}
+.logo-mark::before,.logo-mark::after{content:'';position:absolute;background:var(--gold);
+  border-radius:1px}
+.logo-mark::before{width:18px;height:1.5px;top:11px;left:8px;
+  box-shadow:0 8px 0 var(--gold-lt),0 16px 0 rgba(240,165,0,.5)}
+.logo-mark::after{width:1.5px;height:18px;left:24px;top:11px;
+  background:var(--gold-lt)}
+
+.logo-text .brand{
+  font-family:var(--font-s);font-size:1.05rem;font-weight:600;
+  letter-spacing:2.5px;text-transform:uppercase;color:var(--white);
+  line-height:1;
+}
+.logo-text .brand span{color:var(--gold)}
+.logo-text .sub{
+  font-family:var(--font-m);font-size:.62rem;color:var(--dim);
+  letter-spacing:.18em;text-transform:uppercase;margin-top:6px;
+}
+
+.header-meta{text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.meta-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;border:1px solid var(--border);
+  background:rgba(240,165,0,.05);border-radius:2px;
+  font-family:var(--font-m);font-size:.68rem;color:var(--gold);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.meta-pill i{font-size:.7rem}
+.meta-date{font-family:var(--font-m);font-size:.7rem;color:var(--dim);letter-spacing:.05em}
+.meta-validity{font-family:var(--font-m);font-size:.7rem;color:var(--orange);letter-spacing:.05em;font-weight:500}
+
+/* HERO TITLE */
+.hero{
+  margin-bottom:56px;
+  animation:fadeUp .9s .15s var(--ease) both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:12px;
+  font-family:var(--font-m);font-size:.7rem;font-weight:500;
+  letter-spacing:.25em;text-transform:uppercase;color:var(--gold);
+  margin-bottom:1.4rem;
+}
+.eyebrow::before{content:'';width:32px;height:1px;background:var(--gold)}
+
+.hero-title{
+  font-family:var(--font-d);
+  font-size:clamp(2.4rem,5.5vw,4.6rem);
+  font-weight:700;line-height:1.05;
+  letter-spacing:-1.2px;
+  margin-bottom:1.2rem;
+}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-title .dim-piece{color:rgba(255,255,255,.3);font-weight:300;font-style:normal}
+
+.hero-sub{
+  font-size:.98rem;color:var(--dim);max-width:680px;
+  line-height:1.85;font-weight:300;
+}
+
+/* CONTROL ROW */
+.controls{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  margin-bottom:36px;
+  animation:fadeUp .9s .25s var(--ease) both;
+}
+@media(max-width:760px){.controls{grid-template-columns:1fr}}
+
+.control-card{
+  background:var(--panel);
+  border:1px solid var(--border-soft);
+  border-radius:6px;
+  padding:22px 26px;
+  position:relative;overflow:hidden;
+  transition:border-color .3s;
+}
+.control-card:hover{border-color:rgba(240,165,0,.2)}
+.control-card::before{
+  content:'';position:absolute;left:0;top:0;width:3px;height:100%;
+  background:linear-gradient(180deg,var(--gold) 0%,transparent 100%);
+}
+.control-label{
+  font-family:var(--font-m);font-size:.66rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.control-label i{color:var(--gold)}
+
+.btn-group{display:flex;flex-wrap:wrap;gap:8px}
+.btn{
+  background:transparent;
+  border:1px solid var(--border-soft);
+  color:var(--dim);
+  font-family:var(--font-s);font-size:.78rem;font-weight:500;
+  letter-spacing:.04em;
+  padding:8px 16px;border-radius:2px;
+  cursor:pointer;transition:all .25s;
+  position:relative;
+}
+.btn:hover{color:var(--white);border-color:rgba(240,165,0,.3);background:rgba(240,165,0,.04)}
+.btn.active{
+  background:var(--gold);color:var(--ink);
+  border-color:var(--gold);font-weight:600;
+  box-shadow:0 4px 16px rgba(240,165,0,.25);
+}
+.btn[data-perf="Medium"].active{background:var(--green);color:var(--ink);border-color:var(--green);box-shadow:0 4px 16px rgba(52,211,153,.25)}
+.btn[data-perf="High"].active{background:var(--orange);color:var(--ink);border-color:var(--orange);box-shadow:0 4px 16px rgba(249,115,22,.25)}
+.btn[data-perf="Extreme"].active{background:var(--red);color:var(--white);border-color:var(--red);box-shadow:0 4px 16px rgba(239,68,68,.25)}
+
+/* TABS */
+.tabs-wrapper{
+  margin-bottom:32px;
+  animation:fadeUp .9s .35s var(--ease) both;
+}
+
+.tabs{
+  display:flex;gap:0;
+  border-bottom:1px solid var(--border-soft);
+  overflow-x:auto;
+}
+.tab{
+  background:transparent;border:none;
+  padding:18px 28px;
+  font-family:var(--font-s);font-size:.82rem;font-weight:500;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--dim);cursor:pointer;
+  position:relative;transition:color .3s;
+  display:flex;align-items:center;gap:10px;
+  white-space:nowrap;
+}
+.tab i{font-size:.85rem;color:var(--gold);opacity:.6;transition:opacity .3s}
+.tab:hover{color:var(--white)}
+.tab:hover i{opacity:1}
+.tab.active{color:var(--gold)}
+.tab.active i{opacity:1}
+.tab.active::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;
+  height:2px;background:var(--gold);
+  animation:tabSlide .4s var(--ease);
+}
+@keyframes tabSlide{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.tab-content{
+  display:none;
+  animation:fadeIn .4s var(--ease);
+}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* SECTION HEADER */
+.section-head{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin:32px 0 24px;flex-wrap:wrap;gap:16px;
+}
+.section-head h2{
+  font-family:var(--font-d);font-size:2rem;font-weight:700;
+  letter-spacing:-.5px;color:var(--white);
+}
+.section-head h2 em{color:var(--gold);font-style:italic}
+.section-head p{font-size:.85rem;color:var(--dim);max-width:480px}
+
+/* PROVIDER GRID */
+.provider-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+  gap:20px;
+}
+
+.provider-card{
+  background:var(--panel);
+  border:1px solid var(--border-soft);
+  border-radius:8px;
+  padding:28px 28px 32px;
+  position:relative;overflow:hidden;
+  transition:all .35s var(--ease);
+}
+.provider-card:hover{transform:translateY(-3px);border-color:var(--border)}
+
+.provider-card.is-min{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold),0 12px 48px rgba(240,165,0,.15);
+  background:linear-gradient(135deg,var(--panel) 0%,rgba(240,165,0,.03) 100%);
+}
+
+.provider-card.is-min::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent 0%,var(--gold) 50%,transparent 100%);
+  animation:shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+
+.best-badge{
+  position:absolute;top:16px;right:16px;
+  display:none;align-items:center;gap:6px;
+  padding:5px 11px;
+  background:var(--gold);color:var(--ink);
+  font-family:var(--font-m);font-size:.62rem;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;
+  border-radius:2px;
+}
+.provider-card.is-min .best-badge{display:inline-flex}
+.best-badge i{font-size:.65rem}
+
+.provider-head{
+  display:flex;align-items:center;gap:14px;margin-bottom:20px;
+}
+.provider-icon{
+  width:46px;height:46px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;
+  border:1px solid var(--border-soft);
+  background:rgba(255,255,255,.02);
+}
+.provider-card.is-min .provider-icon{
+  border-color:var(--gold);
+  background:rgba(240,165,0,.08);
+  color:var(--gold);
+}
+.provider-name{
+  font-family:var(--font-s);font-size:.95rem;font-weight:600;
+  letter-spacing:.05em;color:var(--white);
+}
+.provider-tag{
+  font-family:var(--font-m);font-size:.62rem;color:var(--dim);
+  letter-spacing:.15em;text-transform:uppercase;margin-top:3px;
+}
+
+.spec-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  padding:14px 0;margin-bottom:18px;
+  border-top:1px solid var(--border-soft);
+  border-bottom:1px solid var(--border-soft);
+}
+.spec-item{text-align:center}
+.spec-item .v{
+  font-family:var(--font-d);font-size:1.1rem;font-weight:600;
+  color:var(--white);line-height:1;
+}
+.spec-item .l{
+  font-family:var(--font-m);font-size:.58rem;color:var(--dim);
+  letter-spacing:.1em;text-transform:uppercase;margin-top:5px;
+}
+
+.price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.price-row .currency{
+  font-family:var(--font-d);font-size:1.6rem;color:var(--gold);font-weight:600;
+}
+.price-row .amount{
+  font-family:var(--font-d);font-size:2.6rem;font-weight:700;
+  color:var(--white);line-height:1;letter-spacing:-1px;
+}
+.price-row .period{
+  font-family:var(--font-s);font-size:.82rem;color:var(--dim);
+  letter-spacing:.04em;
+}
+
+.provider-card.is-min .price-row .amount{
+  color:var(--gold);
+  text-shadow:0 0 30px rgba(240,165,0,.3);
+}
+
+.price-yearly{
+  font-family:var(--font-m);font-size:.78rem;color:var(--dim);
+  letter-spacing:.04em;padding-top:6px;
+  border-top:1px dashed var(--border-soft);margin-top:6px;
+}
+.price-yearly span{color:var(--off);font-weight:500}
+
+.note-list{
+  margin-top:16px;padding-top:16px;
+  border-top:1px solid var(--border-soft);
+}
+.note-list .note{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:.78rem;color:var(--dim);
+  line-height:1.55;margin-bottom:6px;
+}
+.note-list .note i{color:var(--gold);font-size:.7rem;margin-top:5px;width:12px;flex-shrink:0}
+
+/* TOTAL CARD */
+.total-card{
+  margin-top:32px;
+  background:linear-gradient(135deg,var(--panel) 0%,var(--panel-2) 100%);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:32px 36px;
+  display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center;
+  position:relative;overflow:hidden;
+}
+.total-card::before{
+  content:'';position:absolute;top:0;right:0;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(240,165,0,.06) 0%,transparent 70%);
+}
+.total-label{
+  font-family:var(--font-m);font-size:.7rem;color:var(--dim);
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;
+}
+.total-title{
+  font-family:var(--font-d);font-size:1.6rem;font-weight:700;color:var(--white);
+  letter-spacing:-.3px;margin-bottom:4px;
+}
+.total-title em{color:var(--gold);font-style:italic}
+.total-sub{font-size:.82rem;color:var(--dim)}
+
+.total-amount{text-align:right;position:relative;z-index:2}
+.total-amount .y{
+  font-family:var(--font-m);font-size:.7rem;color:var(--dim);
+  letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;
+}
+.total-amount .v{
+  font-family:var(--font-d);font-size:2.4rem;font-weight:700;
+  color:var(--gold);letter-spacing:-1px;line-height:1;
+}
+.total-amount .x{
+  font-family:var(--font-m);font-size:.75rem;color:var(--off);margin-top:6px;
+}
+
+@media(max-width:700px){
+  .total-card{grid-template-columns:1fr;text-align:center}
+  .total-amount{text-align:center}
+}
+
+/* APP HOSTING SPECIAL */
+.app-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;
+}
+.app-card{
+  background:var(--panel);
+  border:1px solid var(--border-soft);
+  border-radius:8px;padding:28px;
+  position:relative;overflow:hidden;
+  transition:all .35s;
+}
+.app-card:hover{border-color:var(--border);transform:translateY(-3px)}
+.app-card.is-min{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold),0 12px 48px rgba(240,165,0,.15);
+}
+.app-card.is-min::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  animation:shimmer 3s ease-in-out infinite;
+}
+.app-card .best-badge{display:none}
+.app-card.is-min .best-badge{display:inline-flex}
+
+.app-head{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.app-icon{
+  width:50px;height:50px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  border:1px solid var(--border-soft);
+}
+.app-card.is-min .app-icon{border-color:var(--gold);color:var(--gold);background:rgba(240,165,0,.08)}
+.app-name{font-family:var(--font-s);font-size:1rem;font-weight:600;color:var(--white)}
+.app-tag{font-family:var(--font-m);font-size:.62rem;color:var(--dim);letter-spacing:.15em;text-transform:uppercase;margin-top:4px}
+
+.app-prices{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.app-price-block{
+  padding:14px;border:1px solid var(--border-soft);border-radius:6px;
+}
+.app-price-block .l{
+  font-family:var(--font-m);font-size:.6rem;color:var(--dim);
+  letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;
+}
+.app-price-block .v{
+  font-family:var(--font-d);font-size:1.3rem;font-weight:700;color:var(--white);
+  line-height:1;
+}
+.app-price-block .v small{font-size:.7rem;color:var(--dim);font-family:var(--font-m);font-weight:400;margin-left:4px}
+
+/* COMBINED ESTIMATE */
+.combined-section{
+  margin-top:48px;padding-top:48px;
+  border-top:1px solid var(--border-soft);
+  animation:fadeUp .9s var(--ease) both;
+}
+
+.combo-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;
+}
+@media(max-width:860px){.combo-grid{grid-template-columns:1fr}}
+
+.combo-tile{
+  background:var(--panel);
+  border:1px solid var(--border-soft);
+  border-radius:8px;padding:24px 26px;
+  position:relative;
+}
+.combo-tile-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.combo-tile-head i{
+  color:var(--gold);font-size:.85rem;
+  width:28px;height:28px;
+  border:1px solid var(--border-soft);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+}
+.combo-tile-name{
+  font-family:var(--font-m);font-size:.7rem;color:var(--dim);
+  letter-spacing:.15em;text-transform:uppercase;
+}
+.combo-tile-sub{
+  font-family:var(--font-s);font-size:.78rem;color:var(--off);font-weight:500;margin-top:2px;
+}
+.combo-tile-amount{
+  font-family:var(--font-d);font-size:1.7rem;font-weight:700;color:var(--gold);
+  letter-spacing:-.5px;margin-bottom:4px;
+}
+.combo-tile-y{
+  font-family:var(--font-m);font-size:.72rem;color:var(--dim);
+}
+
+/* TERMS */
+.terms{
+  margin-top:64px;padding-top:48px;
+  border-top:1px solid var(--border-soft);
+}
+.terms-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;
+}
+.term{
+  background:var(--panel);border:1px solid var(--border-soft);
+  border-radius:6px;padding:22px 24px;
+  border-left:2px solid var(--gold);
+}
+.term-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+  font-family:var(--font-s);font-size:.8rem;font-weight:600;
+  color:var(--gold);letter-spacing:.06em;text-transform:uppercase;
+}
+.term-head i{font-size:.85rem}
+.term ul{padding-left:18px;list-style:none}
+.term ul li{
+  font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:6px;
+  position:relative;padding-left:14px;
+}
+.term ul li::before{
+  content:'';position:absolute;left:0;top:11px;
+  width:5px;height:1px;background:var(--gold);
+}
+.term ul li strong{color:var(--off);font-weight:600}
+
+/* FOOTER */
+.footer{
+  margin-top:64px;padding-top:32px;
+  border-top:1px solid var(--border-soft);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:16px;
+}
+.footer .copy{font-family:var(--font-m);font-size:.7rem;color:var(--dim);letter-spacing:.05em}
+.footer .stamp{
+  font-family:var(--font-m);font-size:.7rem;color:var(--gold);
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:6px 12px;border:1px solid var(--border);border-radius:2px;
+}
+
+/* RESPONSIVE TABLE FALLBACK */
+@media(max-width:520px){
+  .spec-row{grid-template-columns:repeat(2,1fr)}
+  .price-row .amount{font-size:2rem}
+}
+
+/* HELPER */
+.fade-in{animation:fadeIn .4s var(--ease)}
+</style>
+</head>
+<body>
+
+<div class="glow-bg gb1"></div>
+<div class="glow-bg gb2"></div>
+
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <div class="logo-text">
+        <div class="brand">Kloud<span>Beams</span></div>
+        <div class="sub">Infrastructure Pricing Estimator</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-pill"><i class="fa-regular fa-file-lines"></i> Official Quote</div>
+      <div class="meta-date">Pricing as of 30 April 2026</div>
+      <div class="meta-validity"><i class="fa-regular fa-clock"></i> Valid for 30 days</div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">Reels App · Cost Estimation</div>
+    <h1 class="hero-title">
+      Calculate your <em>complete</em><br>
+      infrastructure spend<br>
+      <span class="dim-piece">across cloud, AI, and stores.</span>
+    </h1>
+    <p class="hero-sub">
+      Select your active user base and performance tier. We'll show you the
+      cheapest provider for each layer of the stack — automatically highlighted —
+      and a combined monthly &amp; yearly estimate. Pricing is indicative and may
+      vary by ±40% based on real-world usage.
+    </p>
+  </section>
+
+  <!-- CONTROLS -->
+  <section class="controls">
+    <div class="control-card">
+      <div class="control-label"><i class="fa-solid fa-users"></i> Active Users</div>
+      <div class="btn-group" id="userGroup">
+        <button class="btn active" data-users="10K">10,000</button>
+        <button class="btn" data-users="25K">25,000</button>
+        <button class="btn" data-users="2L">2 Lakh</button>
+        <button class="btn" data-users="5L">5 Lakh</button>
+        <button class="btn" data-users="20L">20 Lakh</button>
+      </div>
+    </div>
+    <div class="control-card">
+      <div class="control-label"><i class="fa-solid fa-gauge-high"></i> Performance Tier</div>
+      <div class="btn-group" id="perfGroup">
+        <button class="btn active" data-perf="Medium">Medium</button>
+        <button class="btn" data-perf="High">High</button>
+        <button class="btn" data-perf="Extreme">Extreme</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABS -->
+  <section class="tabs-wrapper">
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="cloud"><i class="fa-solid fa-cloud"></i> Cloud Server Cost</button>
+      <button class="tab" data-tab="llm"><i class="fa-solid fa-microchip-ai"></i> LLM API Cost</button>
+      <button class="tab" data-tab="app"><i class="fa-solid fa-mobile-screen-button"></i> App Store Hosting</button>
+    </div>
+
+    <!-- CLOUD TAB -->
+    <div class="tab-content active" id="tab-cloud">
+      <div class="section-head">
+        <div>
+          <h2>Public <em>Cloud Servers</em></h2>
+          <p style="margin-top:6px">Recommended infrastructure for the selected user load and performance tier.</p>
+        </div>
+      </div>
+
+      <div class="provider-grid" id="cloudGrid"></div>
+
+      <div class="total-card">
+        <div>
+          <div class="total-label"><i class="fa-solid fa-trophy" style="color:var(--gold)"></i> Lowest Cloud Cost (Auto-Selected)</div>
+          <div class="total-title">Best <em>Value Provider</em></div>
+          <div class="total-sub" id="cloudWinnerSub">Loading…</div>
+        </div>
+        <div class="total-amount">
+          <div class="y">Cost / Year</div>
+          <div class="v" id="cloudWinnerAmt">—</div>
+          <div class="x" id="cloudWinnerMonth">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LLM TAB -->
+    <div class="tab-content" id="tab-llm">
+      <div class="section-head">
+        <div>
+          <h2>AI / <em>LLM API</em></h2>
+          <p style="margin-top:6px">Estimated cost for video understanding &amp; processing assuming 1 video uploaded per active user per day.</p>
+        </div>
+      </div>
+
+      <div class="provider-grid" id="llmGrid"></div>
+
+      <div class="total-card">
+        <div>
+          <div class="total-label"><i class="fa-solid fa-trophy" style="color:var(--gold)"></i> Lowest AI API Cost</div>
+          <div class="total-title">Best <em>AI Model Pricing</em></div>
+          <div class="total-sub" id="llmWinnerSub">Loading…</div>
+        </div>
+        <div class="total-amount">
+          <div class="y">Cost / Year</div>
+          <div class="v" id="llmWinnerAmt">—</div>
+          <div class="x" id="llmWinnerMonth">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP TAB -->
+    <div class="tab-content" id="tab-app">
+      <div class="section-head">
+        <div>
+          <h2>Mobile App <em>Store Hosting</em></h2>
+          <p style="margin-top:6px">Annual developer subscription &amp; one-time fees for publishing on iOS and Android stores.</p>
+        </div>
+      </div>
+
+      <div class="app-grid" id="appGrid"></div>
+
+      <div class="total-card">
+        <div>
+          <div class="total-label"><i class="fa-solid fa-trophy" style="color:var(--gold)"></i> Cheaper Store</div>
+          <div class="total-title">Best <em>Store to Start With</em></div>
+          <div class="total-sub" id="appWinnerSub">Loading…</div>
+        </div>
+        <div class="total-amount">
+          <div class="y">First Year Total</div>
+          <div class="v" id="appWinnerAmt">—</div>
+          <div class="x" id="appWinnerMonth">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMBINED ESTIMATE -->
+  <section class="combined-section">
+    <div class="section-head">
+      <div>
+        <h2>Combined <em>Monthly Estimate</em></h2>
+        <p style="margin-top:6px">Lowest-cost picks across all three layers. This is the floor — actual spend depends on real usage patterns.</p>
+      </div>
+    </div>
+
+    <div class="combo-grid">
+      <div class="combo-tile">
+        <div class="combo-tile-head">
+          <i class="fa-solid fa-cloud"></i>
+          <div>
+            <div class="combo-tile-name">Cloud Server</div>
+            <div class="combo-tile-sub" id="comboCloudName">—</div>
+          </div>
+        </div>
+        <div class="combo-tile-amount" id="comboCloudAmt">—</div>
+        <div class="combo-tile-y" id="comboCloudY">—</div>
+      </div>
+
+      <div class="combo-tile">
+        <div class="combo-tile-head">
+          <i class="fa-solid fa-brain"></i>
+          <div>
+            <div class="combo-tile-name">LLM / AI API</div>
+            <div class="combo-tile-sub" id="comboLlmName">Google Gemini</div>
+          </div>
+        </div>
+        <div class="combo-tile-amount" id="comboLlmAmt">—</div>
+        <div class="combo-tile-y" id="comboLlmY">—</div>
+      </div>
+
+      <div class="combo-tile">
+        <div class="combo-tile-head">
+          <i class="fa-solid fa-mobile-screen"></i>
+          <div>
+            <div class="combo-tile-name">App Store</div>
+            <div class="combo-tile-sub" id="comboAppName">—</div>
+          </div>
+        </div>
+        <div class="combo-tile-amount" id="comboAppAmt">—</div>
+        <div class="combo-tile-y" id="comboAppY">—</div>
+      </div>
+    </div>
+
+    <div class="total-card">
+      <div>
+        <div class="total-label"><i class="fa-solid fa-calculator" style="color:var(--gold)"></i> Total Combined</div>
+        <div class="total-title">Your <em>Estimated Spend</em></div>
+        <div class="total-sub">Lowest cloud + AI API + cheaper app store. Multiply for both stores if launching on iOS &amp; Android.</div>
+      </div>
+      <div class="total-amount">
+        <div class="y">Per Month</div>
+        <div class="v" id="grandTotal">—</div>
+        <div class="x" id="grandTotalY">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TERMS -->
+  <section class="terms">
+    <div class="section-head">
+      <div>
+        <h2>Terms &amp; <em>Conditions</em></h2>
+        <p style="margin-top:6px">Important context for interpreting these estimates.</p>
+      </div>
+    </div>
+
+    <div class="terms-grid">
+      <div class="term">
+        <div class="term-head"><i class="fa-solid fa-chart-line"></i> Pricing &amp; Estimation</div>
+        <ul>
+          <li>All prices are <strong>indicative estimates</strong>, not binding quotations.</li>
+          <li>Actual costs may <strong>vary by ±40%</strong> based on disk I/O, egress bandwidth, snapshot &amp; CDN usage.</li>
+          <li>All amounts in <strong>Indian Rupees (INR)</strong>, exclusive of GST.</li>
+          <li>Pricing valid for <strong>30 days</strong> from 30 April 2026.</li>
+        </ul>
+      </div>
+
+      <div class="term">
+        <div class="term-head"><i class="fa-solid fa-shield-halved"></i> KloudBeams Provider</div>
+        <ul>
+          <li><strong>Lifetime free</strong> cloud cost analysis &amp; resize advisory.</li>
+          <li>Server setup, Docker config &amp; deployment included.</li>
+          <li>KloudBeams handles patching, capacity planning &amp; incidents.</li>
+          <li>Clients retain <strong>full data ownership</strong> &amp; root access.</li>
+        </ul>
+      </div>
+
+      <div class="term">
+        <div class="term-head"><i class="fa-solid fa-link"></i> Third-Party Providers</div>
+        <ul>
+          <li>Oracle / DigitalOcean / GCP costs are paid <strong>directly by the client</strong>.</li>
+          <li>KloudBeams assists with onboarding at no extra charge.</li>
+          <li><strong>First 3 months</strong>: free cost analysis &amp; resize advice.</li>
+          <li>From month 4: <strong>₹5,000/month</strong> KloudBeams management fee.</li>
+        </ul>
+      </div>
+
+      <div class="term">
+        <div class="term-head"><i class="fa-solid fa-triangle-exclamation"></i> Technical Limits</div>
+        <ul>
+          <li>Quoted specs are <strong>minimum recommended</strong> — high media volume needs more.</li>
+          <li><strong>20 Lakh+ users</strong> require minimum 3 server nodes.</li>
+          <li>Object storage (S3/GCS) recommended separately for video assets.</li>
+          <li>CDN, managed DB &amp; email are <strong>not included</strong> unless quoted.</li>
+        </ul>
+      </div>
+
+      <div class="term">
+        <div class="term-head"><i class="fa-solid fa-lock"></i> Data &amp; Security</div>
+        <ul>
+          <li>SSH key auth, firewalls &amp; DDoS protection are standard.</li>
+          <li>Daily backups recommended — may incur extra cost.</li>
+          <li>Client owns SSL certs, secrets &amp; access controls.</li>
+          <li>KloudBeams never accesses client data without written consent.</li>
+        </ul>
+      </div>
+
+      <div class="term">
+        <div class="term-head"><i class="fa-solid fa-file-contract"></i> General Terms</div>
+        <ul>
+          <li>Estimates assume scope as stated; material changes require revision.</li>
+          <li>KloudBeams may revise pricing with <strong>30 days' notice</strong>.</li>
+          <li>Disputes resolved through <strong>mutual discussion</strong> first.</li>
+          <li>By proceeding, the client accepts these terms in full.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="copy">© 2026 KloudBeams · Enterprise Technology Collective</div>
+    <div class="stamp">Estimate · 30 Apr 2026 → 30 May 2026</div>
+  </footer>
+
+</div>
+
+<script>
+/* ────────────────────────────────────────────────
+   DATA
+─────────────────────────────────────────────────── */
+
+const cloudData = {
+  // [users][perf] → { vCPU, RAM, Storage, Servers, oracle: {month, year}, kloud: {month, year} }
+  '10K': {
+    Medium:  { vcpu:8,  ram:'16 GB',  storage:'2 TB', servers:1, oracle:{m:14942.73,y:179312.76},   kloud:{m:11954.18,y:143450.21} },
+    High:    { vcpu:8,  ram:'16 GB',  storage:'2 TB', servers:1, oracle:{m:26221.04,y:314652.48},   kloud:{m:20976.83,y:251721.98} },
+    Extreme: { vcpu:8,  ram:'16 GB',  storage:'2 TB', servers:1, oracle:{m:37499.34,y:449992.08},   kloud:{m:29999.47,y:359993.66} }
+  },
+  '25K': {
+    Medium:  { vcpu:16, ram:'32 GB',  storage:'2.5 TB', servers:1, oracle:{m:23974.95,y:287699.40},  kloud:{m:19179.96,y:230159.52} },
+    High:    { vcpu:16, ram:'32 GB',  storage:'2.5 TB', servers:1, oracle:{m:43367.35,y:520408.20},  kloud:{m:34693.88,y:416326.56} },
+    Extreme: { vcpu:16, ram:'32 GB',  storage:'2.5 TB', servers:1, oracle:{m:63759.75,y:765117.00},  kloud:{m:51007.80,y:612093.60} }
+  },
+  '2L': {
+    Medium:  { vcpu:32, ram:'128 GB', storage:'10 TB',  servers:1, oracle:{m:74172.73,y:890072.76},   kloud:{m:59338.18,y:712058.21} },
+    High:    { vcpu:32, ram:'128 GB', storage:'10 TB',  servers:1, oracle:{m:122450.15,y:1469401.80}, kloud:{m:97960.12,y:1175521.44} },
+    Extreme: { vcpu:32, ram:'128 GB', storage:'10 TB',  servers:1, oracle:{m:170727.58,y:2048730.96}, kloud:{m:136582.06,y:1638984.77} }
+  },
+  '5L': {
+    Medium:  { vcpu:48, ram:'192 GB', storage:'18 TB',  servers:1, oracle:{m:123124.87,y:1477498.44}, kloud:{m:98499.90,y:1181998.75} },
+    High:    { vcpu:48, ram:'192 GB', storage:'18 TB',  servers:1, oracle:{m:200287.32,y:2403447.84}, kloud:{m:160229.86,y:1922758.27} },
+    Extreme: { vcpu:48, ram:'192 GB', storage:'18 TB',  servers:1, oracle:{m:277449.76,y:3329397.12}, kloud:{m:221959.81,y:2663517.70} }
+  },
+  '20L': {
+    Medium:  { vcpu:48, ram:'192 GB', storage:'30 TB',  servers:3, oracle:{m:511763.94,y:6141167.28},   kloud:{m:409411.15,y:4912933.82} },
+    High:    { vcpu:48, ram:'192 GB', storage:'30 TB',  servers:3, oracle:{m:800206.98,y:9602483.76},   kloud:{m:640165.58,y:7681987.01} },
+    Extreme: { vcpu:48, ram:'192 GB', storage:'30 TB',  servers:3, oracle:{m:1088650.05,y:13063800.60}, kloud:{m:870920.04,y:10451040.48} }
+  }
+};
+
+const llmData = {
+  '10K': { Medium:{m:27000,y:324000},     High:{m:96000,y:1152000},    Extreme:{m:399000,y:4788000} },
+  '25K': { Medium:{m:67500,y:810000},     High:{m:240000,y:2880000},   Extreme:{m:997500,y:11970000} },
+  '2L':  { Medium:{m:540000,y:6480000},   High:{m:1920000,y:23040000}, Extreme:{m:7980000,y:95760000} },
+  '5L':  { Medium:{m:1350000,y:16200000}, High:{m:4800000,y:57600000}, Extreme:{m:19950000,y:239400000} },
+  '20L': { Medium:{m:5400000,y:64800000}, High:{m:19200000,y:230400000}, Extreme:{m:79800000,y:957600000} }
+};
+
+const appData = [
+  { id:'apple',  name:'Apple App Store',    tag:'iOS · iPadOS · macOS', icon:'fa-brands fa-apple',       oneTime:0,    monthly:791,  yearly:9492 },
+  { id:'google', name:'Google Play Store',  tag:'Android',              icon:'fa-brands fa-google-play', oneTime:2450, monthly:0,    yearly:0 }
+];
+
+/* ────────────────────────────────────────────────
+   HELPERS
+─────────────────────────────────────────────────── */
+
+const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const fmtY = n => '₹' + Math.round(n).toLocaleString('en-IN') + ' / yr';
+
+const userLabels = {'10K':'10,000','25K':'25,000','2L':'2,00,000','5L':'5,00,000','20L':'20,00,000'};
+
+let currentUsers = '10K';
+let currentPerf  = 'Medium';
+
+/* ────────────────────────────────────────────────
+   RENDER CLOUD
+─────────────────────────────────────────────────── */
+
+function renderCloud(){
+  const d = cloudData[currentUsers][currentPerf];
+  const grid = document.getElementById('cloudGrid');
+
+  const oracleM = d.oracle.m, kloudM = d.kloud.m;
+  const minProvider = kloudM < oracleM ? 'kloud' : 'oracle';
+
+  const providers = [
+    {
+      id:'oracle',
+      name:'Oracle / DigitalOcean / GCP',
+      tag:'Public Cloud · Self-Managed',
+      icon:'fa-solid fa-cloud',
+      ...d.oracle,
+      notes:[
+        'Pay directly to provider',
+        'KloudBeams onboarding included',
+        'After 3 months: ₹5,000/mo mgmt fee'
+      ]
+    },
+    {
+      id:'kloud',
+      name:'KloudBeams Hosted',
+      tag:'Managed · Lifetime Cost Analysis',
+      icon:'fa-solid fa-cubes-stacked',
+      m: d.kloud.m, y: d.kloud.y,
+      notes:[
+        'Lifetime free cost analysis',
+        'Setup &amp; deployment included',
+        'Full data ownership retained'
+      ]
+    }
+  ];
+
+  grid.innerHTML = providers.map(p => `
+    <article class="provider-card ${p.id===minProvider?'is-min':''}">
+      <div class="best-badge"><i class="fa-solid fa-star"></i> Lowest Price</div>
+      <div class="provider-head">
+        <div class="provider-icon"><i class="${p.icon}"></i></div>
+        <div>
+          <div class="provider-name">${p.name}</div>
+          <div class="provider-tag">${p.tag}</div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-item"><div class="v">${d.vcpu}</div><div class="l">vCPU</div></div>
+        <div class="spec-item"><div class="v">${d.ram}</div><div class="l">RAM</div></div>
+        <div class="spec-item"><div class="v">${d.storage}</div><div class="l">Storage</div></div>
+        <div class="spec-item"><div class="v">${d.servers}</div><div class="l">Server${d.servers>1?'s':''}</div></div>
+      </div>
+      <div class="price-row">
+        <span class="currency">₹</span>
+        <span class="amount">${Math.round(p.m).toLocaleString('en-IN')}</span>
+        <span class="period">/ month</span>
+      </div>
+      <div class="price-yearly">Yearly: <span>₹${Math.round(p.y).toLocaleString('en-IN')}</span></div>
+      <div class="note-list">
+        ${p.notes.map(n=>`<div class="note"><i class="fa-solid fa-check"></i><span>${n}</span></div>`).join('')}
+      </div>
+    </article>
+  `).join('');
+
+  // winner
+  const wM = Math.min(oracleM, kloudM);
+  const wY = minProvider==='kloud' ? d.kloud.y : d.oracle.y;
+  const wName = minProvider==='kloud' ? 'KloudBeams Hosted' : 'Oracle / DigitalOcean / GCP';
+  document.getElementById('cloudWinnerSub').textContent = wName + ' for ' + userLabels[currentUsers] + ' users · ' + currentPerf + ' tier';
+  document.getElementById('cloudWinnerAmt').textContent = fmt(wY);
+  document.getElementById('cloudWinnerMonth').textContent = fmt(wM) + ' / month';
+}
+
+/* ────────────────────────────────────────────────
+   RENDER LLM
+─────────────────────────────────────────────────── */
+
+function renderLLM(){
+  const d = llmData[currentUsers][currentPerf];
+  const grid = document.getElementById('llmGrid');
+
+  // Single provider with comparison vs standard market
+  const market = { m: d.m * 1.45, y: d.y * 1.45 }; // estimated comparable
+
+  const providers = [
+    {
+      id:'gemini',
+      name:'Google Gemini',
+      tag:'Recommended · Multimodal Video',
+      icon:'fa-brands fa-google',
+      m: d.m, y: d.y,
+      isMin:true,
+      notes:[
+        '1 video / user / day estimate',
+        'Best price-performance for video',
+        'Native multimodal understanding'
+      ]
+    },
+    {
+      id:'market',
+      name:'Comparable Market Models',
+      tag:'GPT-4 · Claude · Others',
+      icon:'fa-solid fa-network-wired',
+      m: market.m, y: market.y,
+      isMin:false,
+      notes:[
+        'Higher per-token cost',
+        'Variable video support',
+        'Estimated +45% over Gemini'
+      ]
+    }
+  ];
+
+  grid.innerHTML = providers.map(p => `
+    <article class="provider-card ${p.isMin?'is-min':''}">
+      <div class="best-badge"><i class="fa-solid fa-star"></i> Lowest Price</div>
+      <div class="provider-head">
+        <div class="provider-icon"><i class="${p.icon}"></i></div>
+        <div>
+          <div class="provider-name">${p.name}</div>
+          <div class="provider-tag">${p.tag}</div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-item"><div class="v">${userLabels[currentUsers]}</div><div class="l">Users</div></div>
+        <div class="spec-item"><div class="v">1</div><div class="l">Video / Day</div></div>
+        <div class="spec-item"><div class="v">${currentPerf}</div><div class="l">Quality</div></div>
+        <div class="spec-item"><div class="v">${(currentUsers==='10K'?10:currentUsers==='25K'?25:currentUsers==='2L'?200:currentUsers==='5L'?500:2000)*30}K</div><div class="l">Vid / Mo</div></div>
+      </div>
+      <div class="price-row">
+        <span class="currency">₹</span>
+        <span class="amount">${Math.round(p.m).toLocaleString('en-IN')}</span>
+        <span class="period">/ month</span>
+      </div>
+      <div class="price-yearly">Yearly: <span>₹${Math.round(p.y).toLocaleString('en-IN')}</span></div>
+      <div class="note-list">
+        ${p.notes.map(n=>`<div class="note"><i class="fa-solid fa-check"></i><span>${n}</span></div>`).join('')}
+      </div>
+    </article>
+  `).join('');
+
+  document.getElementById('llmWinnerSub').textContent = 'Google Gemini · ' + userLabels[currentUsers] + ' users · ' + currentPerf + ' quality';
+  document.getElementById('llmWinnerAmt').textContent = fmt(d.y);
+  document.getElementById('llmWinnerMonth').textContent = fmt(d.m) + ' / month';
+}
+
+/* ────────────────────────────────────────────────
+   RENDER APP
+─────────────────────────────────────────────────── */
+
+function renderApp(){
+  const grid = document.getElementById('appGrid');
+
+  // first-year totals: oneTime + (monthly*12 if monthly>0 else yearly)
+  const totals = appData.map(a => ({
+    ...a,
+    firstYear: a.oneTime + (a.monthly>0 ? a.monthly*12 : a.yearly)
+  }));
+  const minId = totals.reduce((min,a)=>a.firstYear<min.firstYear?a:min, totals[0]).id;
+
+  grid.innerHTML = totals.map(a => `
+    <article class="app-card ${a.id===minId?'is-min':''}">
+      <div class="best-badge"><i class="fa-solid fa-star"></i> Cheaper</div>
+      <div class="app-head">
+        <div class="app-icon"><i class="${a.icon}"></i></div>
+        <div>
+          <div class="app-name">${a.name}</div>
+          <div class="app-tag">${a.tag}</div>
+        </div>
+      </div>
+      <div class="app-prices">
+        <div class="app-price-block">
+          <div class="l">One-Time</div>
+          <div class="v">${a.oneTime===0?'Free':'₹'+a.oneTime.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="app-price-block">
+          <div class="l">Recurring</div>
+          <div class="v">${a.monthly>0?'₹'+a.monthly.toLocaleString('en-IN')+'<small>/mo</small>':a.yearly>0?'₹'+a.yearly.toLocaleString('en-IN')+'<small>/yr</small>':'<span style="color:var(--green)">Free</span>'}</div>
+        </div>
+      </div>
+      <div class="price-yearly" style="margin-top:18px">First-year total: <span>₹${a.firstYear.toLocaleString('en-IN')}</span></div>
+    </article>
+  `).join('');
+
+  const win = totals.find(t=>t.id===minId);
+  document.getElementById('appWinnerSub').textContent = win.name + ' · lowest first-year commitment';
+  document.getElementById('appWinnerAmt').textContent = fmt(win.firstYear);
+  document.getElementById('appWinnerMonth').textContent = win.monthly>0 ? fmt(win.monthly)+' / month' : 'one-time payment';
+}
+
+/* ────────────────────────────────────────────────
+   COMBINED
+─────────────────────────────────────────────────── */
+
+function renderCombined(){
+  const c = cloudData[currentUsers][currentPerf];
+  const cloudM = Math.min(c.oracle.m, c.kloud.m);
+  const cloudY = Math.min(c.oracle.y, c.kloud.y);
+  const cloudName = c.kloud.m < c.oracle.m ? 'KloudBeams Hosted' : 'Oracle / DO / GCP';
+
+  const llm = llmData[currentUsers][currentPerf];
+
+  const appTotals = appData.map(a=>a.oneTime + (a.monthly>0 ? a.monthly*12 : a.yearly));
+  const appMin = Math.min(...appTotals);
+  const appMonthly = appMin / 12;
+  const appName = appData[appTotals.indexOf(appMin)].name;
+
+  document.getElementById('comboCloudName').textContent = cloudName;
+  document.getElementById('comboCloudAmt').textContent = fmt(cloudM);
+  document.getElementById('comboCloudY').textContent = fmtY(cloudY);
+
+  document.getElementById('comboLlmAmt').textContent = fmt(llm.m);
+  document.getElementById('comboLlmY').textContent = fmtY(llm.y);
+
+  document.getElementById('comboAppName').textContent = appName;
+  document.getElementById('comboAppAmt').textContent = fmt(appMonthly);
+  document.getElementById('comboAppY').textContent = fmtY(appMin);
+
+  const grandM = cloudM + llm.m + appMonthly;
+  const grandY = cloudY + llm.y + appMin;
+  document.getElementById('grandTotal').textContent = fmt(grandM);
+  document.getElementById('grandTotalY').textContent = fmtY(grandY);
+}
+
+/* ────────────────────────────────────────────────
+   EVENTS
+─────────────────────────────────────────────────── */
+
+function refreshAll(){
+  renderCloud();
+  renderLLM();
+  renderApp();
+  renderCombined();
+}
+
+document.querySelectorAll('#userGroup .btn').forEach(b => {
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#userGroup .btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    currentUsers = b.dataset.users;
+    refreshAll();
+  });
+});
+
+document.querySelectorAll('#perfGroup .btn').forEach(b => {
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#perfGroup .btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    currentPerf = b.dataset.perf;
+    refreshAll();
+  });
+});
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-'+t.dataset.tab).classList.add('active');
+  });
+});
+
+// initial
+refreshAll();
+</script>
+</body>
+</html>

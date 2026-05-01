@@ -1,4 +1,4 @@
-/* ===== Itibachok Barta - Theme Toggle ===== */
+/* ===== Itibachak Barta - Theme Toggle ===== */
 (function () {
   'use strict';
 
